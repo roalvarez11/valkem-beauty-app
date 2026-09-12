@@ -62,7 +62,11 @@
     <div class="flex border-b border-[var(--border-color)] space-x-2 overflow-x-auto">
       <button onclick="cambiarTab('agenda')" id="tab-agenda" class="px-3 py-2 border-b-2 border-palo-rosa text-palo-rosa font-semibold text-xs sm:text-sm flex items-center space-x-1 shrink-0">
         <i class="fa-regular fa-calendar-days"></i>
-        <span>Agenda</span>
+        <span>Próximas Citas</span>
+      </button>
+      <button onclick="cambiarTab('dia')" id="tab-dia" class="px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa">
+        <i class="fa-regular fa-clock"></i>
+        <span>Vista Diaria (Horario)</span>
       </button>
       <button onclick="cambiarTab('clientes')" id="tab-clientes" class="px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa">
         <i class="fa-solid fa-users"></i>
@@ -74,10 +78,10 @@
       </button>
     </div>
 
-    <!-- Pestaña 1: Agenda -->
+    <!-- Pestaña 1: Próximas Citas -->
     <section id="sec-agenda" class="space-y-4">
       <div class="flex justify-between items-center">
-        <h2 class="text-md font-bold text-[var(--text-main)]">Próximas Citas</h2>
+        <h2 class="text-md font-bold text-[var(--text-main)]">Todas las Citas</h2>
         <button onclick="abrirModalCita()" class="bg-palo-rosa text-white font-semibold px-3 py-1.5 rounded-xl text-sm flex items-center space-x-1 shadow-sm transition">
           <i class="fa-solid fa-plus"></i>
           <span>Nueva Cita</span>
@@ -86,7 +90,34 @@
       <div id="lista-citas" class="space-y-3"></div>
     </section>
 
-    <!-- Pestaña 2: Clientes -->
+    <!-- Pestaña 2: Vista Diaria (Estilo Teams / Meet) -->
+    <section id="sec-dia" class="space-y-4 hidden">
+      <div class="bg-white p-4 rounded-2xl border border-[var(--border-color)] shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 class="text-md font-bold text-[var(--text-main)]">Cronograma Diario</h2>
+            <p class="text-xs text-[var(--text-muted)]">Control de bloques horarios ocupados y disponibles</p>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="cambiarDia(-1)" class="px-2.5 py-1.5 rounded-lg border border-[var(--border-color)] bg-[var(--palo-rosa-light)] text-palo-rosa text-xs font-semibold hover:bg-pink-100 transition" title="Día Anterior">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <input type="date" id="fecha-vista-diaria" onchange="cargarVistaDiaria()" class="bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-lg px-3 py-1.5 text-xs text-[var(--text-main)] font-semibold focus:outline-none focus:border-palo-rosa">
+            <button onclick="cambiarDia(1)" class="px-2.5 py-1.5 rounded-lg border border-[var(--border-color)] bg-[var(--palo-rosa-light)] text-palo-rosa text-xs font-semibold hover:bg-pink-100 transition" title="Día Siguiente">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button onclick="irAHoy()" class="px-3 py-1.5 rounded-lg bg-palo-rosa text-white text-xs font-semibold hover:bg-[var(--palo-rosa-hover)] transition shadow-sm">
+              Hoy
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contenedor del cronograma por hora -->
+      <div id="cronograma-dia" class="space-y-2"></div>
+    </section>
+
+    <!-- Pestaña 3: Clientas -->
     <section id="sec-clientes" class="space-y-4 hidden">
       <div class="flex justify-between items-center">
         <h2 class="text-md font-bold text-[var(--text-main)]">Base de Clientas</h2>
@@ -98,7 +129,7 @@
       <div id="lista-clientes" class="space-y-3"></div>
     </section>
 
-    <!-- Pestaña 3: Servicios & Precios -->
+    <!-- Pestaña 4: Servicios & Precios -->
     <section id="sec-servicios" class="space-y-4 hidden">
       <div class="flex justify-between items-center">
         <h2 class="text-md font-bold text-[var(--text-main)]">Catálogo de Servicios</h2>
@@ -221,19 +252,149 @@
         cargarCitas();
         cargarClientes();
         cargarServicios();
+        irAHoy();
       }
     });
 
     function cambiarTab(tab) {
-      ['agenda', 'clientes', 'servicios'].forEach(t => {
+      ['agenda', 'dia', 'clientes', 'servicios'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.toggle('hidden', t !== tab);
         document.getElementById(`tab-${t}`).className = t === tab ? 
           'px-3 py-2 border-b-2 border-palo-rosa text-palo-rosa font-semibold text-xs sm:text-sm flex items-center space-x-1 shrink-0' : 
           'px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa';
       });
+      if (tab === 'dia') {
+        cargarVistaDiaria();
+      }
     }
 
-    // --- MODALES Y NAVEGACIÓN ---
+    // --- FUNCIONES VISTA DIARIA (CRONOGRAMA) ---
+    function cambiarDia(delta) {
+      const input = document.getElementById('fecha-vista-diaria');
+      if (!input.value) return;
+      const parts = input.value.split('-');
+      const f = new Date(parts[0], parts[1] - 1, parts[2]);
+      f.setDate(f.getDate() + delta);
+      const yyyy = f.getFullYear();
+      const mm = String(f.getMonth() + 1).padStart(2, '0');
+      const dd = String(f.getDate()).padStart(2, '0');
+      input.value = `${yyyy}-${mm}-${dd}`;
+      cargarVistaDiaria();
+    }
+
+    function irAHoy() {
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dd = String(hoy.getDate()).padStart(2, '0');
+      document.getElementById('fecha-vista-diaria').value = `${yyyy}-${mm}-${dd}`;
+      cargarVistaDiaria();
+    }
+
+    async function cargarVistaDiaria() {
+      if (!db) return;
+      const inputFecha = document.getElementById('fecha-vista-diaria');
+      if (!inputFecha.value) return;
+      const fechaSel = inputFecha.value;
+      const contenedor = document.getElementById('cronograma-dia');
+
+      const { data: citas, error } = await db.from('citas').select('*, clientes(nombre, telefono)').order('fecha_inicio', { ascending: true });
+
+      if (error) {
+        contenedor.innerHTML = `<div class="bg-red-50 p-4 rounded-xl border border-red-200 text-red-600 text-sm">Error cargando agenda diaria: ${error.message}</div>`;
+        return;
+      }
+
+      const citasDelDia = (citas || []).filter(c => {
+        const f = new Date(c.fecha_inicio);
+        const yyyy = f.getFullYear();
+        const mm = String(f.getMonth() + 1).padStart(2, '0');
+        const dd = String(f.getDate()).padStart(2, '0');
+        return `${yyyy}-${mm}-${dd}` === fechaSel;
+      });
+
+      const horas = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+      let html = '';
+
+      horas.forEach(h => {
+        const horaStr = String(h).padStart(2, '0') + ':00';
+        const slotInicio = new Date(`${fechaSel}T${String(h).padStart(2, '0')}:00:00`);
+        const slotFin = new Date(`${fechaSel}T${String(h + 1).padStart(2, '0')}:00:00`);
+
+        const citasEnBloque = citasDelDia.filter(c => {
+          const cInicio = new Date(c.fecha_inicio);
+          const cFin = new Date(c.fecha_fin);
+          return (cInicio < slotFin) && (cFin > slotInicio);
+        });
+
+        if (citasEnBloque.length > 0) {
+          citasEnBloque.forEach(c => {
+            const fIni = new Date(c.fecha_inicio);
+            const fFin = new Date(c.fecha_fin);
+            const horaInicioStr = fIni.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            const horaFinStr = fFin.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+            const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
+            const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA hoy a las ${horaInicioStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. :)`);
+
+            html += `
+              <div class="flex items-stretch border-l-4 border-rose-400 bg-rose-50/70 rounded-r-xl border border-[var(--border-color)] p-3 shadow-sm transition hover:shadow-md">
+                <div class="w-16 sm:w-20 shrink-0 border-r border-rose-200/80 pr-2 flex flex-col justify-center">
+                  <span class="font-bold text-xs text-rose-800">${horaStr}</span>
+                  <span class="text-[10px] text-rose-500 font-semibold">OCUPADO</span>
+                </div>
+                <div class="pl-3 flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <div class="font-bold text-sm text-[var(--text-main)]">${c.clientes?.nombre || 'Clienta'} <span class="text-xs font-normal text-rose-700">(${horaInicioStr} - ${horaFinStr})</span></div>
+                    <div class="text-xs text-palo-rosa font-semibold"><i class="fa-solid fa-sparkles mr-1"></i>${c.notas || 'Servicio General'}</div>
+                  </div>
+                  <div class="flex items-center space-x-2">
+                    ${tel ? `
+                      <a href="https://wa.me/${tel}?text=${mensaje}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-[11px] px-2 py-1 rounded-lg flex items-center space-x-1 shadow-sm" title="Enviar WhatsApp">
+                        <i class="fa-brands fa-whatsapp"></i>
+                        <span>WhatsApp</span>
+                      </a>
+                    ` : ''}
+                    <button onclick='abrirModalCita(${JSON.stringify(c)})' class="text-gray-400 hover:text-palo-rosa text-xs p-1" title="Editar Cita">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button onclick="eliminarCita('${c.id}')" class="text-gray-400 hover:text-rose-600 text-xs p-1" title="Eliminar Cita">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          });
+        } else {
+          html += `
+            <div class="flex items-center border-l-4 border-emerald-400 bg-white rounded-r-xl border border-[var(--border-color)] p-3 shadow-sm hover:border-emerald-300 transition">
+              <div class="w-16 sm:w-20 shrink-0 border-r border-gray-100 pr-2">
+                <span class="font-semibold text-xs text-gray-500">${horaStr}</span>
+              </div>
+              <div class="pl-3 flex-1 flex items-center justify-between">
+                <span class="text-xs text-emerald-600 font-semibold flex items-center">
+                  <i class="fa-regular fa-circle-check mr-1.5 text-emerald-500"></i> Disponible
+                </span>
+                <button onclick="abrirModalCitaConHora('${fechaSel}', '${horaStr}')" class="bg-[var(--palo-rosa-light)] hover:bg-palo-rosa hover:text-white text-palo-rosa font-semibold text-xs px-2.5 py-1 rounded-lg border border-[var(--border-color)] flex items-center space-x-1 transition">
+                  <i class="fa-solid fa-plus text-[10px]"></i>
+                  <span>Agendar</span>
+                </button>
+              </div>
+            </div>
+          `;
+        }
+      });
+
+      contenedor.innerHTML = html;
+    }
+
+    function abrirModalCitaConHora(fecha, hora) {
+      abrirModalCita();
+      if (fecha) document.getElementById('cita-fecha').value = fecha;
+      if (hora) document.getElementById('cita-hora').value = hora;
+    }
+
+    // --- MODALES Y NAVEGACIÓN GENERAL ---
     function abrirModalCita(cita = null) {
       if (cita) {
         citaEditandoId = cita.id;
@@ -333,6 +494,7 @@
         cerrarModalCliente();
         cargarClientes();
         cargarCitas();
+        cargarVistaDiaria();
       } catch (err) {
         alert("Error al guardar clienta: " + err.message);
       }
@@ -532,6 +694,7 @@
 
         cerrarModalCita();
         cargarCitas();
+        cargarVistaDiaria();
         cargarClientes();
       } catch (err) {
         alert("Error al guardar la cita: " + err.message);
@@ -559,7 +722,7 @@
         const horaStr = f.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
         
-        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. \n\n*Importante:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto para regalonearte! :)`);
+        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! 💕 Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). ✨\n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. 😉\n\n*Nota:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto para regalonearte! 💅✨`);
 
         return `
           <div class="bg-card p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center shadow-sm">
@@ -591,6 +754,7 @@
       if (confirm("¿Seguro que deseas eliminar esta cita de la agenda?")) {
         await db.from('citas').delete().eq('id', id);
         cargarCitas();
+        cargarVistaDiaria();
       }
     }
   </script>
