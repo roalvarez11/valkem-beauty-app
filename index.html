@@ -334,7 +334,10 @@
             const horaInicioStr = fIni.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
             const horaFinStr = fFin.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
             const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
-            const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA hoy a las ${horaInicioStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. :)`);
+            const nombreCliente = c.clientes?.nombre ? ` ${c.clientes.nombre}` : '';
+            
+            // MENSAJE SIN EMOJIS - CERCANO Y EDUCADO
+            const mensaje = encodeURIComponent(`Hola${nombreCliente}, ¿cómo estás? Te escribimos de Valkem Beauty SpA para recordarte tu cita de hoy a las ${horaInicioStr} hrs (${c.notas || 'Servicio'}). Por favor confírmanos tu asistencia respondiendo a este mensaje. ¡Te esperamos!`);
 
             html += `
               <div class="flex items-stretch border-l-4 border-rose-400 bg-rose-50/70 rounded-r-xl border border-[var(--border-color)] p-3 shadow-sm transition hover:shadow-md">
@@ -721,8 +724,10 @@
         const fechaStr = f.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const horaStr = f.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
+        const nombreCliente = c.clientes?.nombre ? ` ${c.clientes.nombre}` : '';
         
-        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! 💕 Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). ✨\n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. 😉\n\n*Nota:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto para regalonearte! 💅✨`);
+        // MENSAJE SIN EMOJIS - CERCANO Y EDUCADO
+        const mensaje = encodeURIComponent(`Hola${nombreCliente}, ¿cómo estás? Te escribimos de Valkem Beauty SpA para recordarte tu cita del ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). Por favor confírmanos tu asistencia respondiendo a este mensaje.\n\nNota: Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto!`);
 
         return `
           <div class="bg-card p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center shadow-sm">
