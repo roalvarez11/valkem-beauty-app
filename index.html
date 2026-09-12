@@ -429,7 +429,7 @@
         const horaStr = f.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
         
-        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! 💕 Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). ✨\n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. 😉\n\n*Nota:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto! 💅✨`);
+        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. \n\n*Nota:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto! :)`);
 
         return `
           <div class="bg-card p-4 rounded-xl border border-gray-800 flex justify-between items-center shadow">
