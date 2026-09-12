@@ -583,28 +583,27 @@
     }
 
     async function guardarServicio(e) {
-      e.preventDefault();
-      const nombre = document.getElementById('srv-nombre').value;
-      const precio = parseFloat(document.getElementById('srv-precio').value);
-      const duracion_minutos = parseInt(document.getElementById('srv-duracion').value);
-      const categoria = document.getElementById('srv-categoria').value;
+  e.preventDefault();
+  const nombre = document.getElementById('srv-nombre').value;
+  const precio = parseFloat(document.getElementById('srv-precio').value);
+  const duracion_minutos = parseInt(document.getElementById('srv-duracion').value);
 
-      try {
-        if (servicioEditandoId) {
-          const { error } = await db.from('servicios').update({ nombre, precio, duracion_minutos, categoria }).eq('id', servicioEditandoId);
-          if (error) throw error;
-          alert("¡Servicio actualizado!");
-        } else {
-          const { error } = await db.from('servicios').insert([{ nombre, precio, duracion_minutos, categoria }]);
-          if (error) throw error;
-          alert("¡Servicio creado!");
-        }
-        cerrarModalServicio();
-        cargarServicios();
-      } catch(err) {
-        alert("Error al guardar servicio: " + err.message);
-      }
+  try {
+    if (servicioEditandoId) {
+      const { error } = await db.from('servicios').update({ nombre, precio, duracion_minutos }).eq('id', servicioEditandoId);
+      if (error) throw error;
+      alert("¡Servicio actualizado!");
+    } else {
+      const { error } = await db.from('servicios').insert([{ nombre, precio, duracion_minutos }]);
+      if (error) throw error;
+      alert("¡Servicio creado!");
     }
+    cerrarModalServicio();
+    cargarServicios();
+  } catch(err) {
+    alert("Error al guardar servicio: " + err.message);
+  }
+}
 
     async function eliminarServicio(id) {
       if (confirm("¿Seguro que deseas eliminar este servicio?")) {
