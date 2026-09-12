@@ -9,28 +9,29 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --charcoal: #1e1e24;
-      --charcoal-card: #2b2b36;
-      --rosegold: #d4af37;
-      --rosegold-accent: #e5b974;
+      --bg-main: #faf3f5;
+      --bg-card: #ffffff;
+      --palo-rosa: #c97a90;
+      --palo-rosa-hover: #b3647a;
+      --palo-rosa-light: #f7eaed;
+      --text-main: #4a3b40;
+      --text-muted: #8c737a;
+      --border-color: #f0dade;
     }
-    body { background-color: var(--charcoal); color: #f3f4f6; font-family: system-ui, -apple-system, sans-serif; }
-    .bg-card { background-color: var(--charcoal-card); }
-    .border-rosegold { border-color: var(--rosegold); }
-    .text-rosegold { color: var(--rosegold); }
-    .bg-rosegold { background-color: var(--rosegold); }
-    .bg-rosegold:hover { background-color: var(--rosegold-accent); }
+    body { background-color: var(--bg-main); color: var(--text-main); font-family: system-ui, -apple-system, sans-serif; }
+    .bg-card { background-color: var(--bg-card); }
+    .border-palo-rosa { border-color: var(--palo-rosa); }
+    .text-palo-rosa { color: var(--palo-rosa); }
+    .bg-palo-rosa { background-color: var(--palo-rosa); color: #ffffff; }
+    .bg-palo-rosa:hover { background-color: var(--palo-rosa-hover); }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
   <script>
-    // ========================================================
-    // CREDENCIALES CONFIGURADAS DE SUPABASE:
-    // ========================================================
+    // CREDENCIALES CONFIGURADAS
     const SUPABASE_URL = 'https://gojpuduyhfstbujgxszl.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvanB1ZHV5aGZzdGJ1amd4c3psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNzc4MzUsImV4cCI6MjEwNDc1MzgzNX0.EXL9JkLzohA6ATkEZdFOZy3wP_Fmbbyz4aK_F6pmUKY';
-    // ========================================================
 
     let db = null;
     if (typeof supabase !== 'undefined') {
@@ -38,18 +39,18 @@
     }
   </script>
 
-  <header class="bg-card border-b border-rosegold/30 p-4 sticky top-0 z-50 shadow-lg">
+  <header class="bg-white border-b border-[var(--border-color)] p-4 sticky top-0 z-50 shadow-sm">
     <div class="max-w-4xl mx-auto flex justify-between items-center">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-full bg-rosegold/20 border border-rosegold flex items-center justify-center text-rosegold font-bold text-xl">
+        <div class="w-10 h-10 rounded-full bg-[var(--palo-rosa-light)] border border-palo-rosa flex items-center justify-center text-palo-rosa font-bold text-xl shadow-sm">
           V
         </div>
         <div>
-          <h1 class="font-bold text-lg text-rosegold tracking-wide">VALKEM BEAUTY SpA</h1>
-          <p class="text-xs text-gray-400">Sistema de Agenda & Ficha Técnica</p>
+          <h1 class="font-bold text-lg text-palo-rosa tracking-wide">VALKEM BEAUTY SpA</h1>
+          <p class="text-xs text-[var(--text-muted)]">Sistema de Agenda & Ficha Técnica</p>
         </div>
       </div>
-      <div id="status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+      <div id="status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200">
         Conectando...
       </div>
     </div>
@@ -57,29 +58,17 @@
 
   <main class="flex-1 max-w-4xl w-full mx-auto p-4 space-y-6">
 
-    <div id="alert-credentials" class="bg-card border-l-4 border-amber-500 p-4 rounded-r shadow-md hidden">
-      <div class="flex items-start">
-        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mr-3 mt-1"></i>
-        <div>
-          <h3 class="font-semibold text-amber-400">Falta conectar con Supabase</h3>
-          <p class="text-xs text-gray-300 mt-1">
-            Verifica la configuración de las credenciales.
-          </p>
-        </div>
-      </div>
-    </div>
-
     <!-- Navegación de Pestañas -->
-    <div class="flex border-b border-gray-700 space-x-2 overflow-x-auto">
-      <button onclick="cambiarTab('agenda')" id="tab-agenda" class="px-3 py-2 border-b-2 border-rosegold text-rosegold font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0">
+    <div class="flex border-b border-[var(--border-color)] space-x-2 overflow-x-auto">
+      <button onclick="cambiarTab('agenda')" id="tab-agenda" class="px-3 py-2 border-b-2 border-palo-rosa text-palo-rosa font-semibold text-xs sm:text-sm flex items-center space-x-1 shrink-0">
         <i class="fa-regular fa-calendar-days"></i>
         <span>Agenda</span>
       </button>
-      <button onclick="cambiarTab('clientes')" id="tab-clientes" class="px-3 py-2 text-gray-400 font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0">
+      <button onclick="cambiarTab('clientes')" id="tab-clientes" class="px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa">
         <i class="fa-solid fa-users"></i>
         <span>Clientas</span>
       </button>
-      <button onclick="cambiarTab('servicios')" id="tab-servicios" class="px-3 py-2 text-gray-400 font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0">
+      <button onclick="cambiarTab('servicios')" id="tab-servicios" class="px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa">
         <i class="fa-solid fa-tags"></i>
         <span>Servicios & Precios</span>
       </button>
@@ -88,8 +77,8 @@
     <!-- Pestaña 1: Agenda -->
     <section id="sec-agenda" class="space-y-4">
       <div class="flex justify-between items-center">
-        <h2 class="text-md font-semibold text-gray-200">Próximas Citas</h2>
-        <button onclick="abrirModalCita()" class="bg-rosegold text-gray-900 font-semibold px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1 shadow">
+        <h2 class="text-md font-bold text-[var(--text-main)]">Próximas Citas</h2>
+        <button onclick="abrirModalCita()" class="bg-palo-rosa text-white font-semibold px-3 py-1.5 rounded-xl text-sm flex items-center space-x-1 shadow-sm transition">
           <i class="fa-solid fa-plus"></i>
           <span>Nueva Cita</span>
         </button>
@@ -100,8 +89,8 @@
     <!-- Pestaña 2: Clientes -->
     <section id="sec-clientes" class="space-y-4 hidden">
       <div class="flex justify-between items-center">
-        <h2 class="text-md font-semibold text-gray-200">Base de Clientas</h2>
-        <button onclick="abrirModalCliente()" class="bg-rosegold text-gray-900 font-semibold px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1 shadow">
+        <h2 class="text-md font-bold text-[var(--text-main)]">Base de Clientas</h2>
+        <button onclick="abrirModalCliente()" class="bg-palo-rosa text-white font-semibold px-3 py-1.5 rounded-xl text-sm flex items-center space-x-1 shadow-sm transition">
           <i class="fa-solid fa-user-plus"></i>
           <span>Registrar Clienta</span>
         </button>
@@ -112,8 +101,8 @@
     <!-- Pestaña 3: Servicios & Precios -->
     <section id="sec-servicios" class="space-y-4 hidden">
       <div class="flex justify-between items-center">
-        <h2 class="text-md font-semibold text-gray-200">Catálogo de Servicios</h2>
-        <button onclick="abrirModalServicio()" class="bg-rosegold text-gray-900 font-semibold px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1 shadow">
+        <h2 class="text-md font-bold text-[var(--text-main)]">Catálogo de Servicios</h2>
+        <button onclick="abrirModalServicio()" class="bg-palo-rosa text-white font-semibold px-3 py-1.5 rounded-xl text-sm flex items-center space-x-1 shadow-sm transition">
           <i class="fa-solid fa-plus"></i>
           <span>Nuevo Servicio</span>
         </button>
@@ -123,101 +112,111 @@
 
   </main>
 
-  <!-- Modal Cita -->
-  <div id="modal-cita" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-card w-full max-w-md rounded-xl border border-gray-700 p-5 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-        <h3 class="font-semibold text-rosegold">Agendar Cita</h3>
-        <button onclick="cerrarModalCita()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+  <!-- Modal Cita (Añadir / Editar) -->
+  <div id="modal-cita" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl border border-[var(--border-color)] p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-3">
+        <h3 id="modal-cita-titulo" class="font-bold text-palo-rosa text-lg">Agendar Cita</h3>
+        <button onclick="cerrarModalCita()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <form onsubmit="guardarCita(event)" class="space-y-3 text-sm">
         <div>
-          <label class="block text-xs text-gray-300 mb-1">Nombre Clienta</label>
-          <input type="text" id="cita-cliente" required placeholder="Ej: María González" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Nombre Clienta</label>
+          <input type="text" id="cita-cliente" required placeholder="Ej: María González" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
         </div>
         <div>
-          <label class="block text-xs text-gray-300 mb-1">WhatsApp</label>
-          <input type="tel" id="cita-telefono" required placeholder="+56912345678" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">WhatsApp</label>
+          <input type="tel" id="cita-telefono" required placeholder="+56912345678" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
         </div>
         <div>
-          <label class="block text-xs text-gray-300 mb-1">Servicio</label>
-          <select id="cita-servicio" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Servicio</label>
+          <select id="cita-servicio" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
             <option value="">Cargando servicios...</option>
           </select>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs text-gray-300 mb-1">Fecha</label>
-            <input type="date" id="cita-fecha" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Fecha</label>
+            <input type="date" id="cita-fecha" required class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
           </div>
           <div>
-            <label class="block text-xs text-gray-300 mb-1">Hora</label>
-            <input type="time" id="cita-hora" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Hora</label>
+            <input type="time" id="cita-hora" required class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
           </div>
         </div>
-        <button type="submit" class="w-full bg-rosegold text-gray-900 font-bold py-2 rounded-lg hover:bg-amber-400 mt-2">Guardar Cita</button>
+        <button type="submit" class="w-full bg-palo-rosa text-white font-bold py-2.5 rounded-xl hover:bg-[var(--palo-rosa-hover)] transition shadow-md mt-2">Guardar Cita</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Registrar Clienta -->
-  <div id="modal-cliente" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-card w-full max-w-md rounded-xl border border-gray-700 p-5 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-        <h3 class="font-semibold text-rosegold">Registrar Nueva Clienta</h3>
-        <button onclick="cerrarModalCliente()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+  <!-- Modal Clienta (Añadir / Editar) -->
+  <div id="modal-cliente" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl border border-[var(--border-color)] p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-3">
+        <h3 id="modal-cli-titulo" class="font-bold text-palo-rosa text-lg">Registrar Clienta</h3>
+        <button onclick="cerrarModalCliente()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <form onsubmit="guardarClienteDirecto(event)" class="space-y-3 text-sm">
         <div>
-          <label class="block text-xs text-gray-300 mb-1">Nombre Completo</label>
-          <input type="text" id="cli-nombre" required placeholder="Ej: María González" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Nombre Completo</label>
+          <input type="text" id="cli-nombre" required placeholder="Ej: María González" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
         </div>
         <div>
-          <label class="block text-xs text-gray-300 mb-1">WhatsApp / Teléfono</label>
-          <input type="tel" id="cli-telefono" required placeholder="+56912345678" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">WhatsApp / Teléfono</label>
+          <input type="tel" id="cli-telefono" required placeholder="+56912345678" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
         </div>
         <div>
-          <label class="block text-xs text-gray-300 mb-1">Ficha Técnica / Notas (Opcional)</label>
-          <textarea id="cli-ficha" rows="3" placeholder="Alergias, tipo de uñas/piel, colores favoritos..." class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white"></textarea>
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Ficha Técnica / Notas (Opcional)</label>
+          <textarea id="cli-ficha" rows="3" placeholder="Alergias, tipo de uñas/piel, colores favoritos..." class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa"></textarea>
         </div>
-        <button type="submit" class="w-full bg-rosegold text-gray-900 font-bold py-2 rounded-lg hover:bg-amber-400 mt-2">Guardar Clienta</button>
+        <button type="submit" class="w-full bg-palo-rosa text-white font-bold py-2.5 rounded-xl hover:bg-[var(--palo-rosa-hover)] transition shadow-md mt-2">Guardar Clienta</button>
       </form>
     </div>
   </div>
 
-  <!-- Modal Añadir / Editar Servicio -->
-  <div id="modal-servicio" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
-    <div class="bg-card w-full max-w-md rounded-xl border border-gray-700 p-5 space-y-4 shadow-2xl">
-      <div class="flex justify-between items-center border-b border-gray-700 pb-2">
-        <h3 id="modal-srv-titulo" class="font-semibold text-rosegold">Añadir / Editar Servicio</h3>
-        <button onclick="cerrarModalServicio()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+  <!-- Modal Servicio (Añadir / Editar) -->
+  <div id="modal-servicio" class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-white w-full max-w-md rounded-2xl border border-[var(--border-color)] p-6 space-y-4 shadow-xl">
+      <div class="flex justify-between items-center border-b border-[var(--border-color)] pb-3">
+        <h3 id="modal-srv-titulo" class="font-bold text-palo-rosa text-lg">Añadir / Editar Servicio</h3>
+        <button onclick="cerrarModalServicio()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
       <form onsubmit="guardarServicio(event)" class="space-y-3 text-sm">
         <div>
-          <label class="block text-xs text-gray-300 mb-1">Nombre del Tratamiento</label>
-          <input type="text" id="srv-nombre" required placeholder="Ej: Manicura Rusa" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Nombre del Tratamiento</label>
+          <input type="text" id="srv-nombre" required placeholder="Ej: Manicura Rusa" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Especialidad</label>
+          <select id="srv-categoria" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
+            <option value="Manicura">Manicura / Uñas</option>
+            <option value="Facial">Facial / Piel</option>
+          </select>
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div>
-            <label class="block text-xs text-gray-300 mb-1">Precio ($)</label>
-            <input type="number" id="srv-precio" required placeholder="25000" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Precio ($)</label>
+            <input type="number" id="srv-precio" required placeholder="25000" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
           </div>
           <div>
-            <label class="block text-xs text-gray-300 mb-1">Duración (minutos)</label>
-            <input type="number" id="srv-duracion" required placeholder="60" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white">
+            <label class="block text-xs font-semibold text-[var(--text-main)] mb-1">Duración (minutos)</label>
+            <input type="number" id="srv-duracion" required placeholder="60" class="w-full bg-[var(--palo-rosa-light)] border border-[var(--border-color)] rounded-xl p-2.5 text-[var(--text-main)] focus:outline-none focus:border-palo-rosa">
           </div>
         </div>
-        <button type="submit" class="w-full bg-rosegold text-gray-900 font-bold py-2 rounded-lg hover:bg-amber-400 mt-2">Guardar Servicio</button>
+        <button type="submit" class="w-full bg-palo-rosa text-white font-bold py-2.5 rounded-xl hover:bg-[var(--palo-rosa-hover)] transition shadow-md mt-2">Guardar Servicio</button>
       </form>
     </div>
   </div>
 
   <script>
     let servicioEditandoId = null;
+    let clienteEditandoId = null;
+    let citaEditandoId = null;
+    let serviciosCache = [];
 
     document.addEventListener("DOMContentLoaded", () => {
       if (db) {
-        document.getElementById('status-badge').className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        document.getElementById('status-badge').className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200";
         document.getElementById('status-badge').innerText = "Conectado a Supabase";
         cargarCitas();
         cargarClientes();
@@ -229,15 +228,66 @@
       ['agenda', 'clientes', 'servicios'].forEach(t => {
         document.getElementById(`sec-${t}`).classList.toggle('hidden', t !== tab);
         document.getElementById(`tab-${t}`).className = t === tab ? 
-          'px-3 py-2 border-b-2 border-rosegold text-rosegold font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0' : 
-          'px-3 py-2 text-gray-400 font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0';
+          'px-3 py-2 border-b-2 border-palo-rosa text-palo-rosa font-semibold text-xs sm:text-sm flex items-center space-x-1 shrink-0' : 
+          'px-3 py-2 text-[var(--text-muted)] font-medium text-xs sm:text-sm flex items-center space-x-1 shrink-0 hover:text-palo-rosa';
       });
     }
 
-    function abrirModalCita() { document.getElementById('modal-cita').classList.remove('hidden'); }
-    function cerrarModalCita() { document.getElementById('modal-cita').classList.add('hidden'); }
-    function abrirModalCliente() { document.getElementById('modal-cliente').classList.remove('hidden'); }
-    function cerrarModalCliente() { document.getElementById('modal-cliente').classList.add('hidden'); }
+    // --- MODALES Y NAVEGACIÓN ---
+    function abrirModalCita(cita = null) {
+      if (cita) {
+        citaEditandoId = cita.id;
+        document.getElementById('modal-cita-titulo').innerText = "Editar Cita";
+        document.getElementById('cita-cliente').value = cita.clientes?.nombre || '';
+        document.getElementById('cita-telefono').value = cita.clientes?.telefono || '';
+        document.getElementById('cita-servicio').value = cita.notas || '';
+        
+        const f = new Date(cita.fecha_inicio);
+        const yyyy = f.getFullYear();
+        const mm = String(f.getMonth() + 1).padStart(2, '0');
+        const dd = String(f.getDate()).padStart(2, '0');
+        const hh = String(f.getHours()).padStart(2, '0');
+        const min = String(f.getMinutes()).padStart(2, '0');
+
+        document.getElementById('cita-fecha').value = `${yyyy}-${mm}-${dd}`;
+        document.getElementById('cita-hora').value = `${hh}:${min}`;
+      } else {
+        citaEditandoId = null;
+        document.getElementById('modal-cita-titulo').innerText = "Agendar Cita";
+        document.getElementById('cita-cliente').value = '';
+        document.getElementById('cita-telefono').value = '';
+        document.getElementById('cita-fecha').value = '';
+        document.getElementById('cita-hora').value = '';
+      }
+      document.getElementById('modal-cita').classList.remove('hidden');
+    }
+
+    function cerrarModalCita() { 
+      document.getElementById('modal-cita').classList.add('hidden'); 
+      citaEditandoId = null;
+    }
+
+    function abrirModalCliente(cliente = null) {
+      if (cliente) {
+        clienteEditandoId = cliente.id;
+        document.getElementById('modal-cli-titulo').innerText = "Editar Clienta";
+        document.getElementById('cli-nombre').value = cliente.nombre || '';
+        document.getElementById('cli-telefono').value = cliente.telefono || '';
+        document.getElementById('cli-ficha').value = cliente.notas_historial || '';
+      } else {
+        clienteEditandoId = null;
+        document.getElementById('modal-cli-titulo').innerText = "Registrar Nueva Clienta";
+        document.getElementById('cli-nombre').value = '';
+        document.getElementById('cli-telefono').value = '';
+        document.getElementById('cli-ficha').value = '';
+      }
+      document.getElementById('modal-cliente').classList.remove('hidden');
+    }
+
+    function cerrarModalCliente() { 
+      document.getElementById('modal-cliente').classList.add('hidden'); 
+      clienteEditandoId = null;
+    }
 
     function abrirModalServicio(s = null) {
       if (s) {
@@ -246,12 +296,14 @@
         document.getElementById('srv-nombre').value = s.nombre;
         document.getElementById('srv-precio').value = s.precio;
         document.getElementById('srv-duracion').value = s.duracion_minutos;
+        document.getElementById('srv-categoria').value = s.categoria || 'Manicura';
       } else {
         servicioEditandoId = null;
         document.getElementById('modal-srv-titulo').innerText = "Nuevo Servicio";
         document.getElementById('srv-nombre').value = '';
         document.getElementById('srv-precio').value = '';
-        document.getElementById('srv-duracion').value = '';
+        document.getElementById('srv-duracion').value = '60';
+        document.getElementById('srv-categoria').value = 'Manicura';
       }
       document.getElementById('modal-servicio').classList.remove('hidden');
     }
@@ -261,7 +313,7 @@
       servicioEditandoId = null;
     }
 
-    // --- CLIENTES ---
+    // --- SECCIÓN CLIENTAS ---
     async function guardarClienteDirecto(e) {
       e.preventDefault();
       const nombre = document.getElementById('cli-nombre').value;
@@ -269,47 +321,73 @@
       const notas_historial = document.getElementById('cli-ficha').value;
 
       try {
-        const { error } = await db.from('clientes').insert([{ nombre, telefono, notas_historial }]);
-        if (error) throw error;
-        alert("¡Clienta registrada con éxito!");
+        if (clienteEditandoId) {
+          const { error } = await db.from('clientes').update({ nombre, telefono, notas_historial }).eq('id', clienteEditandoId);
+          if (error) throw error;
+          alert("¡Clienta actualizada con éxito!");
+        } else {
+          const { error } = await db.from('clientes').insert([{ nombre, telefono, notas_historial }]);
+          if (error) throw error;
+          alert("¡Clienta registrada con éxito!");
+        }
         cerrarModalCliente();
-        document.getElementById('cli-nombre').value = '';
-        document.getElementById('cli-telefono').value = '';
-        document.getElementById('cli-ficha').value = '';
         cargarClientes();
+        cargarCitas();
       } catch (err) {
-        alert("Error al registrar clienta: " + err.message);
+        alert("Error al guardar clienta: " + err.message);
       }
     }
 
     async function cargarClientes() {
       if (!db) return;
-      const { data: clientes, error } = await db.from('clientes').select('*').order('created_at', { ascending: false });
+      const { data: clientes, error } = await db.from('clientes').select('*').order('nombre', { ascending: true });
       const contenedor = document.getElementById('lista-clientes');
 
       if (error) {
-        contenedor.innerHTML = `<div class="bg-card p-4 rounded-xl border border-red-800 text-red-400 text-sm">Error cargando clientas: ${error.message}</div>`;
+        contenedor.innerHTML = `<div class="bg-red-50 p-4 rounded-xl border border-red-200 text-red-600 text-sm">Error cargando clientas: ${error.message}</div>`;
         return;
       }
 
       if (!clientes || clientes.length === 0) {
-        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">No hay clientes registradas. Usa el botón "Registrar Clienta".</div>';
+        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-[var(--border-color)] text-center text-[var(--text-muted)] text-sm">No hay clientes registradas. Usa el botón "Registrar Clienta".</div>';
         return;
       }
 
       contenedor.innerHTML = clientes.map(cl => `
-        <div class="bg-card p-4 rounded-xl border border-gray-800 shadow space-y-1">
-          <div class="font-bold text-white text-md">${cl.nombre}</div>
-          <div class="text-xs text-gray-400"><i class="fa-solid fa-phone text-rosegold mr-1"></i>${cl.telefono}</div>
-          ${cl.notas_historial ? `<div class="text-xs bg-gray-900/50 p-2 rounded text-gray-300 mt-2 border border-gray-800"><strong>Ficha Técnica:</strong> ${cl.notas_historial}</div>` : ''}
+        <div class="bg-card p-4 rounded-xl border border-[var(--border-color)] shadow-sm space-y-1 flex justify-between items-start">
+          <div class="space-y-1">
+            <div class="font-bold text-[var(--text-main)] text-md">${cl.nombre}</div>
+            <div class="text-xs text-[var(--text-muted)]"><i class="fa-solid fa-phone text-palo-rosa mr-1"></i>${cl.telefono}</div>
+            ${cl.notas_historial ? `<div class="text-xs bg-[var(--palo-rosa-light)] p-2.5 rounded-lg text-[var(--text-main)] mt-2 border border-pink-200/60"><strong>Ficha Técnica:</strong> ${cl.notas_historial}</div>` : ''}
+          </div>
+          <div class="flex space-x-1 shrink-0 ml-2">
+            <button onclick='abrirModalCliente(${JSON.stringify(cl)})' class="text-gray-400 hover:text-palo-rosa text-xs p-2" title="Editar Clienta">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button onclick="eliminarCliente('${cl.id}')" class="text-gray-400 hover:text-rose-500 text-xs p-2" title="Eliminar Clienta">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </div>
       `).join('');
     }
 
-    // --- SERVICIOS ---
+    async function eliminarCliente(id) {
+      if (confirm("¿Seguro que deseas eliminar esta clienta?")) {
+        const { error } = await db.from('clientes').delete().eq('id', id);
+        if (error) {
+          alert("No se puede eliminar la clienta porque tiene citas agendadas asociadas. Elimina sus citas primero.");
+        } else {
+          cargarClientes();
+        }
+      }
+    }
+
+    // --- SECCIÓN SERVICIOS ---
     async function cargarServicios() {
       if (!db) return;
       const { data: servicios } = await db.from('servicios').select('*').order('nombre');
+      serviciosCache = servicios || [];
       const selectCita = document.getElementById('cita-servicio');
       const listaServicios = document.getElementById('lista-servicios');
 
@@ -317,16 +395,17 @@
         selectCita.innerHTML = servicios.map(s => `<option value="${s.nombre}">${s.nombre} - $${Number(s.precio).toLocaleString('es-CL')}</option>`).join('');
         
         listaServicios.innerHTML = servicios.map(s => `
-          <div class="bg-card p-4 rounded-xl border border-gray-800 flex justify-between items-center shadow">
+          <div class="bg-card p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center shadow-sm">
             <div>
-              <div class="font-bold text-white">${s.nombre}</div>
-              <div class="text-xs text-rosegold mt-1">$${Number(s.precio).toLocaleString('es-CL')} • ${s.duracion_minutos} min</div>
+              <div class="font-bold text-[var(--text-main)]">${s.nombre}</div>
+              <div class="text-xs text-[var(--text-muted)] font-semibold">${s.categoria || 'General'}</div>
+              <div class="text-xs text-palo-rosa font-bold mt-1">$${Number(s.precio).toLocaleString('es-CL')} • ${s.duracion_minutos || 60} min</div>
             </div>
             <div class="flex items-center space-x-1">
-              <button onclick='abrirModalServicio(${JSON.stringify(s)})' class="text-gray-400 hover:text-rosegold text-xs p-2" title="Editar Servicio">
+              <button onclick='abrirModalServicio(${JSON.stringify(s)})' class="text-gray-400 hover:text-palo-rosa text-xs p-2" title="Editar Servicio">
                 <i class="fa-solid fa-pen"></i>
               </button>
-              <button onclick="eliminarServicio('${s.id}')" class="text-gray-500 hover:text-red-400 text-xs p-2" title="Eliminar Servicio">
+              <button onclick="eliminarServicio('${s.id}')" class="text-gray-400 hover:text-rose-500 text-xs p-2" title="Eliminar Servicio">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -334,7 +413,7 @@
         `).join('');
       } else {
         selectCita.innerHTML = '<option value="Servicio General">Servicio General</option>';
-        listaServicios.innerHTML = '<div class="col-span-2 bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">No hay servicios en el catálogo.</div>';
+        listaServicios.innerHTML = '<div class="col-span-2 bg-card p-4 rounded-xl border border-[var(--border-color)] text-center text-[var(--text-muted)] text-sm">No hay servicios en el catálogo.</div>';
       }
     }
 
@@ -343,14 +422,15 @@
       const nombre = document.getElementById('srv-nombre').value;
       const precio = parseFloat(document.getElementById('srv-precio').value);
       const duracion_minutos = parseInt(document.getElementById('srv-duracion').value);
+      const categoria = document.getElementById('srv-categoria').value;
 
       try {
         if (servicioEditandoId) {
-          const { error } = await db.from('servicios').update({ nombre, precio, duracion_minutos }).eq('id', servicioEditandoId);
+          const { error } = await db.from('servicios').update({ nombre, precio, duracion_minutos, categoria }).eq('id', servicioEditandoId);
           if (error) throw error;
           alert("¡Servicio actualizado!");
         } else {
-          const { error } = await db.from('servicios').insert([{ nombre, precio, duracion_minutos }]);
+          const { error } = await db.from('servicios').insert([{ nombre, precio, duracion_minutos, categoria }]);
           if (error) throw error;
           alert("¡Servicio creado!");
         }
@@ -368,43 +448,93 @@
       }
     }
 
-    // --- CITAS ---
+    // --- SECCIÓN CITAS & CONTROL DE TOPE DE HORARIOS ---
     async function guardarCita(e) {
       e.preventDefault();
       const nombre = document.getElementById('cita-cliente').value;
       const telefono = document.getElementById('cita-telefono').value;
-      const servicio = document.getElementById('cita-servicio').value;
+      const servicioNombre = document.getElementById('cita-servicio').value;
       const fecha = document.getElementById('cita-fecha').value;
       const hora = document.getElementById('cita-hora').value;
 
       try {
+        const srvObj = serviciosCache.find(s => s.nombre === servicioNombre);
+        const duracionMin = srvObj ? (srvObj.duracion_minutos || 60) : 60;
+        const categoriaSrv = srvObj ? srvObj.categoria : null;
+
+        const fechaInicio = new Date(`${fecha}T${hora}`);
+        const fechaFin = new Date(fechaInicio.getTime() + duracionMin * 60 * 1000);
+
+        // VALIDACIÓN DE TOPE DE HORARIO
+        const { data: citasExistentes, error: errCitas } = await db.from('citas').select('*, clientes(nombre)');
+        if (errCitas) throw errCitas;
+
+        const conflicto = citasExistentes.find(c => {
+          if (citaEditandoId && c.id === citaEditandoId) return false;
+          
+          const inicioExist = new Date(c.fecha_inicio);
+          const finExist = new Date(c.fecha_fin);
+
+          const haySolapamiento = (fechaInicio < finExist) && (fechaFin > inicioExist);
+          
+          if (haySolapamiento) {
+            const cSrvObj = serviciosCache.find(s => s.nombre === c.notas);
+            const cCategoria = cSrvObj ? cSrvObj.categoria : null;
+
+            if (!categoriaSrv || !cCategoria || categoriaSrv === cCategoria) {
+              return true;
+            }
+          }
+          return false;
+        });
+
+        if (conflicto) {
+          const horaConflict = new Date(conflicto.fecha_inicio).toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+          const confirmarTope = confirm(
+            `⚠️ ALERTA DE TOPE DE HORARIO:\n\n` +
+            `Ya existe una cita agendada para "${conflicto.clientes?.nombre || 'otra clienta'}" ` +
+            `a las ${horaConflict} hrs (${conflicto.notas}).\n\n` +
+            `¿Deseas agendarla de todas formas?`
+          );
+          if (!confirmarTope) return;
+        }
+
         let { data: cliente } = await db.from('clientes').select('id').eq('telefono', telefono).limit(1).maybeSingle();
         
         if (!cliente) {
           const { data: newCliente, error: errCli } = await db.from('clientes').insert([{ nombre, telefono }]).select().single();
           if (errCli) throw errCli;
           cliente = newCliente;
+        } else {
+          await db.from('clientes').update({ nombre }).eq('id', cliente.id);
         }
 
-        const fechaInicio = new Date(`${fecha}T${hora}`);
-        const fechaFin = new Date(fechaInicio.getTime() + 60*60*1000);
+        if (citaEditandoId) {
+          const { error: errCita } = await db.from('citas').update({
+            cliente_id: cliente.id,
+            fecha_inicio: fechaInicio.toISOString(),
+            fecha_fin: fechaFin.toISOString(),
+            notas: servicioNombre
+          }).eq('id', citaEditandoId);
+          if (errCita) throw errCita;
+          alert("¡Cita modificada con éxito!");
+        } else {
+          const { error: errCita } = await db.from('citas').insert([{
+            cliente_id: cliente.id,
+            fecha_inicio: fechaInicio.toISOString(),
+            fecha_fin: fechaFin.toISOString(),
+            estado: 'confirmada',
+            notas: servicioNombre
+          }]);
+          if (errCita) throw errCita;
+          alert("¡Cita agendada con éxito!");
+        }
 
-        const { error: errCita } = await db.from('citas').insert([{
-          cliente_id: cliente ? cliente.id : null,
-          fecha_inicio: fechaInicio.toISOString(),
-          fecha_fin: fechaFin.toISOString(),
-          estado: 'confirmada',
-          notas: servicio
-        }]);
-
-        if (errCita) throw errCita;
-
-        alert("¡Cita agendada con éxito!");
         cerrarModalCita();
         cargarCitas();
         cargarClientes();
       } catch (err) {
-        alert("Error al agendar cita: " + err.message);
+        alert("Error al guardar la cita: " + err.message);
       }
     }
 
@@ -414,12 +544,12 @@
       const contenedor = document.getElementById('lista-citas');
 
       if (error) {
-        contenedor.innerHTML = `<div class="bg-card p-4 rounded-xl border border-red-800 text-red-400 text-sm">Error cargando citas: ${error.message}</div>`;
+        contenedor.innerHTML = `<div class="bg-red-50 p-4 rounded-xl border border-red-200 text-red-600 text-sm">Error cargando citas: ${error.message}</div>`;
         return;
       }
 
       if (!citas || citas.length === 0) {
-        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">No hay citas agendadas.</div>';
+        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-[var(--border-color)] text-center text-[var(--text-muted)] text-sm">No hay citas agendadas.</div>';
         return;
       }
 
@@ -429,24 +559,39 @@
         const horaStr = f.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
         const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
         
-        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. \n\n*Nota:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto! :)`);
+        const mensaje = encodeURIComponent(`¡Hola ${c.clientes?.nombre || 'bella'}! Te recordamos tu cita en Valkem Beauty SpA el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). \n\nPor favor confírmanos tu asistencia respondiendo a este mensaje. \n\n*Importante:* Por respeto al tiempo de todas nuestras clientas y el orden de la agenda, tenemos una tolerancia máxima de 15 minutos de atraso. ¡Nos vemos pronto para regalonearte! :)`);
 
         return `
-          <div class="bg-card p-4 rounded-xl border border-gray-800 flex justify-between items-center shadow">
+          <div class="bg-card p-4 rounded-xl border border-[var(--border-color)] flex justify-between items-center shadow-sm">
             <div>
-              <div class="font-bold text-white">${c.clientes?.nombre || 'Clienta'}</div>
-              <div class="text-xs text-rosegold mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${fechaStr} - ${horaStr} hrs</div>
-              <div class="text-xs text-gray-400 mt-0.5">${c.notas || 'Servicio General'}</div>
+              <div class="font-bold text-[var(--text-main)]">${c.clientes?.nombre || 'Clienta'}</div>
+              <div class="text-xs text-palo-rosa font-semibold mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${fechaStr} - ${horaStr} hrs</div>
+              <div class="text-xs text-[var(--text-muted)] mt-0.5">${c.notas || 'Servicio General'}</div>
             </div>
-            ${tel ? `
-              <a href="https://wa.me/${tel}?text=${mensaje}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-2 rounded-lg flex items-center space-x-1">
-                <i class="fa-brands fa-whatsapp text-sm"></i>
-                <span>Recordatorio</span>
-              </a>
-            ` : ''}
+            <div class="flex items-center space-x-2">
+              ${tel ? `
+                <a href="https://wa.me/${tel}?text=${mensaje}" target="_blank" class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-xs px-2.5 py-1.5 rounded-lg flex items-center space-x-1 shadow-sm transition" title="Enviar Recordatorio por WhatsApp">
+                  <i class="fa-brands fa-whatsapp text-sm"></i>
+                  <span class="hidden sm:inline">WhatsApp</span>
+                </a>
+              ` : ''}
+              <button onclick='abrirModalCita(${JSON.stringify(c)})' class="text-gray-400 hover:text-palo-rosa text-xs p-1.5" title="Editar Cita">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button onclick="eliminarCita('${c.id}')" class="text-gray-400 hover:text-rose-500 text-xs p-1.5" title="Eliminar Cita">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </div>
         `;
       }).join('');
+    }
+
+    async function eliminarCita(id) {
+      if (confirm("¿Seguro que deseas eliminar esta cita de la agenda?")) {
+        await db.from('citas').delete().eq('id', id);
+        cargarCitas();
+      }
     }
   </script>
 </body>
