@@ -1,1536 +1,294 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Valkem Beauty SpA - Sistema de Gestión & Agenda WhatsApp</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts Inter & Playfair Display for elegant typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        valkem: {
-                            50: '#fff1f2',
-                            100: '#ffe4e6',
-                            200: '#fecdd3',
-                            300: '#fda4af',
-                            400: '#fb7185',
-                            500: '#f43f5e',
-                            600: '#e11d48',
-                            dark: '#1c1917',     /* Dark charcoal slate */
-                            charcoal: '#27272a',
-                            roseGold: '#e0a96d', /* Rose Gold highlight */
-                            roseGoldLight: '#f4e3d3',
-                            goldAccent: '#d4af37'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        serif: ['Playfair Display', 'serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #fff1f2;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #fda4af;
-            border-radius: 9999px;
-        }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(254, 205, 211, 0.6);
-        }
-        .tab-btn.active {
-            background: linear-gradient(135deg, #1c1917 0%, #27272a 100%);
-            color: #f4e3d3;
-            border-left: 4px solid #e0a96d;
-            box-shadow: 0 4px 14px rgba(28, 25, 23, 0.3);
-        }
-        .gold-border-gradient {
-            border-image: linear-gradient(to right, #e0a96d, #f43f5e) 1;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Valkem Beauty SpA - Sistema de Gestión</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --charcoal: #1e1e24;
+      --charcoal-card: #2b2b36;
+      --rosegold: #d4af37;
+      --rosegold-accent: #e5b974;
+    }
+    body {
+      background-color: var(--charcoal);
+      color: #f3f4f6;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .bg-card { background-color: var(--charcoal-card); }
+    .border-rosegold { border-color: var(--rosegold); }
+    .text-rosegold { color: var(--rosegold); }
+    .bg-rosegold { background-color: var(--rosegold); }
+    .bg-rosegold:hover { background-color: var(--rosegold-accent); }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-rose-50 via-stone-50 to-amber-50 min-h-screen font-sans text-stone-800 flex flex-col md:flex-row">
+<body class="min-h-screen flex flex-col">
 
-    <!-- Sidebar Navigation -->
-    <aside class="w-full md:w-64 bg-valkem-dark text-white flex flex-col justify-between shrink-0 shadow-2xl z-20">
+  <script>
+    // ========================================================
+    // PEGA AQUÍ TUS CREDENCIALES DE SUPABASE:
+    // ========================================================
+    const SUPABASE_URL = 'https://gojpuduyhfstbujgxszl.supabase.co/rest/v1/';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvanB1ZHV5aGZzdGJ1amd4c3psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxNzc4MzUsImV4cCI6MjEwNDc1MzgzNX0.EXL9JkLzohA6ATkEZdFOZy3wP_Fmbbyz4aK_F6pmUKY';
+    // ========================================================
+
+    // Inicializar cliente Supabase
+    let db = null;
+    if (SUPABASE_URL !== 'AQUÍ_TU_PROJECT_URL' && typeof supabase !== 'undefined') {
+      db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+  </script>
+
+  <!-- Encabezado Valkem Beauty SpA -->
+  <header class="bg-card border-b border-rosegold/30 p-4 sticky top-0 z-50 shadow-lg">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-full bg-rosegold/20 border border-rosegold flex items-center justify-center text-rosegold font-bold text-xl">
+          V
+        </div>
         <div>
-            <!-- Valkem Beauty SpA Brand Logo Header -->
-            <div class="p-6 border-b border-stone-800 flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-600 via-rose-500 to-amber-300 flex items-center justify-center text-valkem-dark font-bold text-xl shadow-lg ring-2 ring-valkem-roseGold/40">
-                    <i data-lucide="sparkles" class="w-6 h-6 text-stone-900"></i>
-                </div>
-                <div>
-                    <h1 class="font-serif font-bold text-lg leading-tight tracking-wider text-amber-100">VALKEM BEAUTY</h1>
-                    <p class="text-[10px] uppercase tracking-widest text-amber-200/70 font-semibold">SpA • Studio & WhatsApp</p>
-                </div>
-            </div>
+          <h1 class="font-bold text-lg text-rosegold tracking-wide">VALKEM BEAUTY SpA</h1>
+          <p class="text-xs text-gray-400">Sistema de Agenda & Ficha Técnica</p>
+        </div>
+      </div>
+      <div id="status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+        Pendiente Credenciales
+      </div>
+    </div>
+  </header>
 
-            <!-- Navigation Links -->
-            <nav class="p-4 space-y-1.5" id="sidebar-nav">
-                <button onclick="switchTab('agenda')" id="nav-agenda" class="tab-btn active w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-200">
-                    <i data-lucide="calendar" class="w-5 h-5 text-amber-400"></i>
-                    <span>Agenda y Citas</span>
-                </button>
-                <button onclick="switchTab('clientes')" id="nav-clientes" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-300 hover:bg-stone-800/60 transition-all duration-200">
-                    <i data-lucide="users" class="w-5 h-5 text-amber-400"></i>
-                    <span>Clientes & Ficha Técnica</span>
-                </button>
-                <button onclick="switchTab('whatsapp')" id="nav-whatsapp" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-300 hover:bg-stone-800/60 transition-all duration-200">
-                    <i data-lucide="message-square" class="w-5 h-5 text-emerald-400"></i>
-                    <span>Seguimiento WhatsApp</span>
-                    <span id="pending-whatsapp-badge" class="ml-auto bg-emerald-500 text-stone-950 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
-                </button>
-                <button onclick="switchTab('servicios')" id="nav-servicios" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-300 hover:bg-stone-800/60 transition-all duration-200">
-                    <i data-lucide="scissors" class="w-5 h-5 text-amber-400"></i>
-                    <span>Servicios & Precios</span>
-                </button>
-                <button onclick="switchTab('personal')" id="nav-personal" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-300 hover:bg-stone-800/60 transition-all duration-200">
-                    <i data-lucide="user-check" class="w-5 h-5 text-amber-400"></i>
-                    <span>Equipo Especialista</span>
-                </button>
-                <button onclick="switchTab('config')" id="nav-config" class="tab-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-sm text-stone-300 hover:bg-stone-800/60 transition-all duration-200">
-                    <i data-lucide="code" class="w-5 h-5 text-purple-400"></i>
-                    <span>GitHub / Supabase Integration</span>
-                </button>
-            </nav>
+  <!-- Contenido Principal -->
+  <main class="flex-1 max-w-4xl w-full mx-auto p-4 space-y-6">
+
+    <!-- Tarjeta de Alerta si faltan las credenciales -->
+    <div id="alert-credentials" class="bg-card border-l-4 border-amber-500 p-4 rounded-r shadow-md">
+      <div class="flex items-start">
+        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-xl mr-3 mt-1"></i>
+        <div>
+          <h3 class="font-semibold text-amber-400">Falta conectar con Supabase</h3>
+          <p class="text-xs text-gray-300 mt-1">
+            Para activar la base de datos, edita este archivo en GitHub y reemplaza <code>AQUÍ_TU_PROJECT_URL</code> y <code>AQUÍ_TU_ANON_KEY</code> con tus claves de Supabase.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navegación de Pestañas -->
+    <div class="flex border-b border-gray-700 space-x-2">
+      <button onclick="cambiarTab('agenda')" id="tab-agenda" class="px-4 py-2 border-b-2 border-rosegold text-rosegold font-medium text-sm flex items-center space-x-2">
+        <i class="fa-regular fa-calendar-days"></i>
+        <span>Agenda & Citas</span>
+      </button>
+      <button onclick="cambiarTab('clientes')" id="tab-clientes" class="px-4 py-2 text-gray-400 font-medium text-sm flex items-center space-x-2">
+        <i class="fa-solid fa-users"></i>
+        <span>Clientes & Ficha</span>
+      </button>
+    </div>
+
+    <!-- Pestaña 1: Agenda -->
+    <section id="sec-agenda" class="space-y-4">
+      <div class="flex justify-between items-center">
+        <h2 class="text-md font-semibold text-gray-200">Próximas Citas</h2>
+        <button onclick="abrirModalCita()" class="bg-rosegold text-gray-900 font-semibold px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1 shadow">
+          <i class="fa-solid fa-plus"></i>
+          <span>Nueva Cita</span>
+        </button>
+      </div>
+
+      <div id="lista-citas" class="space-y-3">
+        <div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">
+          No hay citas registradas. Haz clic en "Nueva Cita" para agendar.
+        </div>
+      </div>
+    </section>
+
+    <!-- Pestaña 2: Clientes & Ficha Técnica -->
+    <section id="sec-clientes" class="space-y-4 hidden">
+      <div class="flex justify-between items-center">
+        <h2 class="text-md font-semibold text-gray-200">Base de Clientas</h2>
+        <button onclick="abrirModalCliente()" class="bg-rosegold text-gray-900 font-semibold px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1 shadow">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Registrar Clienta</span>
+        </button>
+      </div>
+
+      <div id="lista-clientes" class="space-y-3">
+        <div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">
+          Cargando listado de clientas...
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Nueva Cita -->
+  <div id="modal-cita" class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 hidden z-50">
+    <div class="bg-card w-full max-w-md rounded-xl border border-gray-700 p-5 space-y-4 shadow-2xl">
+      <div class="flex justify-between items-center border-b border-gray-700 pb-2">
+        <h3 class="font-semibold text-rosegold">Agendar Nueva Cita</h3>
+        <button onclick="cerrarModalCita()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="form-cita" onsubmit="guardarCita(event)" class="space-y-3 text-sm">
+        <div>
+          <label class="block text-xs text-gray-300 mb-1">Nombre de la Clienta</label>
+          <input type="text" id="cita-cliente" required placeholder="Ej: María González" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-rosegold">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-300 mb-1">Teléfono WhatsApp</label>
+          <input type="tel" id="cita-telefono" required placeholder="+56912345678" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-rosegold">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-300 mb-1">Servicio</label>
+          <select id="cita-servicio" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-rosegold">
+            <option value="Manicura Rusa + Soft Gel">Manicura Rusa + Soft Gel ($25.000)</option>
+            <option value="Limpieza Facial Profunda">Limpieza Facial Profunda ($30.000)</option>
+            <option value="Lifting de Pestañas">Lifting de Pestañas ($18.000)</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs text-gray-300 mb-1">Fecha</label>
+            <input type="date" id="cita-fecha" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-rosegold">
+          </div>
+          <div>
+            <label class="block text-xs text-gray-300 mb-1">Hora</label>
+            <input type="time" id="cita-hora" required class="w-full bg-gray-900 border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-rosegold">
+          </div>
         </div>
 
-        <!-- Operational Info Banner -->
-        <div class="p-4 border-t border-stone-800 text-xs text-stone-400 space-y-2">
-            <div class="flex justify-between items-center">
-                <span>Estado Valkem System:</span>
-                <span class="bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded border border-emerald-500/30 font-semibold">Operativo</span>
-            </div>
-            <p class="text-[10px] text-stone-400 leading-relaxed">Valkem Beauty SpA © 2026. Datos guardados de forma privada local + opción respaldo Cloud.</p>
-        </div>
-    </aside>
+        <button type="submit" class="w-full bg-rosegold text-gray-900 font-bold py-2 rounded-lg hover:bg-amber-400 mt-2">
+          Guardar Cita
+        </button>
+      </form>
+    </div>
+  </div>
 
-    <!-- Main Workspace -->
-    <main class="flex-1 flex flex-col h-screen overflow-y-auto">
+  <script>
+    // Comprobar estado de conexion al cargar
+    document.addEventListener("DOMContentLoaded", () => {
+      if (db) {
+        document.getElementById('status-badge').className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+        document.getElementById('status-badge').innerText = "Conectado a Supabase";
+        document.getElementById('alert-credentials').classList.add('hidden');
+        cargarCitas();
+        cargarClientes();
+      }
+    });
+
+    function cambiarTab(tab) {
+      document.getElementById('sec-agenda').classList.toggle('hidden', tab !== 'agenda');
+      document.getElementById('sec-clientes').classList.toggle('hidden', tab !== 'clientes');
+      
+      document.getElementById('tab-agenda').className = tab === 'agenda' ? 
+        'px-4 py-2 border-b-2 border-rosegold text-rosegold font-medium text-sm flex items-center space-x-2' : 
+        'px-4 py-2 text-gray-400 font-medium text-sm flex items-center space-x-2';
         
-        <!-- Top App Bar Header -->
-        <header class="glass-panel sticky top-0 z-10 px-6 py-4 flex flex-wrap justify-between items-center gap-4 border-b border-rose-200/60 shadow-xs">
-            <div class="flex items-center gap-3">
-                <div>
-                    <h2 id="page-title" class="text-xl font-serif font-bold text-valkem-dark tracking-wide">Agenda de Horarios</h2>
-                    <p class="text-xs text-rose-800/70 font-medium">Panel de control y citas para Valkem Beauty SpA</p>
-                </div>
-                <span id="current-date-badge" class="bg-rose-100/80 text-valkem-dark text-xs px-3 py-1 rounded-full font-semibold border border-rose-200 flex items-center gap-1.5 ml-2">
-                    <i data-lucide="calendar-days" class="w-3.5 h-3.5 text-amber-700"></i>
-                    <span id="current-date-text"></span>
-                </span>
-            </div>
-
-            <!-- Quick Action & Stats Group -->
-            <div class="flex items-center gap-3">
-                <div class="hidden xl:flex items-center gap-3 text-xs bg-white/70 px-3 py-1.5 rounded-xl border border-rose-200">
-                    <span class="text-stone-500">Citas Hoy: <strong id="top-stat-citas" class="text-valkem-dark">0</strong></span>
-                    <span class="text-stone-300">|</span>
-                    <span class="text-stone-500">Clientes: <strong id="top-stat-clientes" class="text-valkem-dark">0</strong></span>
-                </div>
-
-                <button onclick="openNewAppointmentModal()" class="bg-gradient-to-r from-valkem-dark via-stone-800 to-valkem-dark hover:from-stone-900 hover:to-stone-950 text-valkem-roseGoldLight px-5 py-2.5 rounded-xl font-semibold text-sm shadow-md hover:shadow-lg flex items-center gap-2 transition-all transform active:scale-95 border border-amber-500/30">
-                    <i data-lucide="plus-circle" class="w-4 h-4 text-amber-400"></i>
-                    <span>+ Agendar Cita</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Dynamic Content Views Container -->
-        <div class="p-6 flex-1">
-
-            <!-- TAB 1: AGENDA / CALENDARIO -->
-            <section id="view-agenda" class="space-y-6">
-                <!-- Filters & Date Controls Bar -->
-                <div class="glass-panel p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between shadow-xs">
-                    <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                        <label class="text-xs font-bold uppercase tracking-wider text-stone-700 flex items-center gap-1">
-                            <i data-lucide="calendar" class="w-4 h-4 text-amber-600"></i> Fecha Agenda:
-                        </label>
-                        <input type="date" id="agenda-date-picker" onchange="renderAgenda()" class="bg-white border border-rose-200 rounded-xl px-3 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-rose-400">
-                        <button onclick="setAgendaToday()" class="bg-rose-100 hover:bg-rose-200 text-valkem-dark text-xs px-3 py-1.5 rounded-xl font-semibold transition">Hoy</button>
-                    </div>
-
-                    <!-- Staff Filter Buttons -->
-                    <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 w-full sm:w-auto" id="staff-filter-container">
-                        <!-- Dynamic buttons -->
-                    </div>
-                </div>
-
-                <!-- Day Schedule Layout Grid -->
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Schedule Timeline (Left 2 cols) -->
-                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl shadow-xs border border-rose-100">
-                        <div class="flex justify-between items-center mb-5 pb-3 border-b border-rose-100">
-                            <h3 class="font-serif font-bold text-stone-800 text-base flex items-center gap-2">
-                                <i data-lucide="clock" class="w-5 h-5 text-amber-600"></i>
-                                Citas Agendadas del Día (09:00 - 20:00)
-                            </h3>
-                            <span class="text-xs bg-rose-100 text-rose-900 px-3 py-1 rounded-full font-bold" id="agenda-count-badge">0 citas agendadas</span>
-                        </div>
-
-                        <!-- Hour Slots List -->
-                        <div class="space-y-3" id="timeline-slots-container">
-                            <!-- Populated dynamically by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Side Overview / Quick Stats (Right 1 col) -->
-                    <div class="space-y-6">
-                        <!-- Daily Revenue Card for Valkem Beauty SpA -->
-                        <div class="bg-gradient-to-br from-valkem-dark via-stone-900 to-valkem-charcoal text-white p-6 rounded-2xl shadow-xl relative overflow-hidden border border-amber-500/30">
-                            <div class="absolute -right-4 -bottom-4 opacity-10 text-amber-200">
-                                <i data-lucide="crown" class="w-36 h-36"></i>
-                            </div>
-                            <h4 class="text-amber-300 text-xs font-bold uppercase tracking-widest mb-1">Ventas Estimadas del Día</h4>
-                            <div class="text-3xl font-serif font-extrabold text-amber-100 mb-4" id="daily-revenue">$0 CLP</div>
-                            
-                            <div class="space-y-2 border-t border-stone-800 pt-3 text-xs">
-                                <div class="flex justify-between text-stone-300">
-                                    <span>Confirmadas:</span>
-                                    <span id="stat-confirmed-count" class="font-bold text-emerald-400">0</span>
-                                </div>
-                                <div class="flex justify-between text-stone-300">
-                                    <span>Completadas:</span>
-                                    <span id="stat-completed-count" class="font-bold text-sky-400">0</span>
-                                </div>
-                                <div class="flex justify-between text-stone-300">
-                                    <span>Canceladas:</span>
-                                    <span id="stat-canceled-count" class="font-bold text-rose-400">0</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Mini Reminders Box -->
-                        <div class="glass-panel p-5 rounded-2xl border border-rose-100 space-y-3">
-                            <h4 class="font-bold text-stone-800 text-sm flex items-center gap-2">
-                                <i data-lucide="bell" class="w-4 h-4 text-amber-600"></i>
-                                Recordatorios Próximos (WhatsApp)
-                            </h4>
-                            <div id="mini-reminders-list" class="space-y-2 text-xs">
-                                <!-- Dynamic items -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 2: CLIENTES Y FICHA TÉCNICA -->
-            <section id="view-clientes" class="hidden space-y-6">
-                <!-- Client Search & Actions Bar -->
-                <div class="glass-panel p-4 rounded-2xl flex flex-wrap gap-4 items-center justify-between shadow-xs">
-                    <div class="relative flex-1 min-w-[260px]">
-                        <i data-lucide="search" class="w-4 h-4 absolute left-3 top-3 text-stone-400"></i>
-                        <input type="text" id="client-search-input" onkeyup="renderClients()" placeholder="Buscar clienta por nombre, teléfono, alergias o notas..." class="w-full bg-white border border-rose-200 rounded-xl pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rose-400">
-                    </div>
-                    <button onclick="openNewClientModal()" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 shadow-sm transition border border-amber-500/20">
-                        <i data-lucide="user-plus" class="w-4 h-4 text-amber-400"></i>
-                        <span>+ Nueva Clienta</span>
-                    </button>
-                </div>
-
-                <!-- Clients Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="clients-grid">
-                    <!-- Dynamic clients content -->
-                </div>
-            </section>
-
-            <!-- TAB 3: SEGUIMIENTO Y WHATSAPP -->
-            <section id="view-whatsapp" class="hidden space-y-6">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    
-                    <!-- Pending WhatsApp Queue -->
-                    <div class="lg:col-span-2 glass-panel p-6 rounded-2xl border border-rose-100 shadow-xs space-y-4">
-                        <div class="flex justify-between items-center border-b border-rose-100 pb-3">
-                            <div>
-                                <h3 class="font-serif font-bold text-stone-800 text-base flex items-center gap-2">
-                                    <i data-lucide="send" class="w-5 h-5 text-emerald-600"></i>
-                                    Mensajes de WhatsApp Sugeridos para Valkem Beauty SpA
-                                </h3>
-                                <p class="text-xs text-stone-500">Recordatorios de 24h previas, confirmación inmediata y avisos de retoque</p>
-                            </div>
-                            <span class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-bold">API / Web WA Directo</span>
-                        </div>
-
-                        <!-- Queue Container -->
-                        <div id="whatsapp-queue-container" class="space-y-3">
-                            <!-- Dynamic WhatsApp items -->
-                        </div>
-                    </div>
-
-                    <!-- Template Editor & Controls -->
-                    <div class="space-y-6">
-                        <div class="glass-panel p-6 rounded-2xl border border-rose-100 shadow-xs space-y-4">
-                            <h4 class="font-bold text-stone-800 text-sm flex items-center gap-2">
-                                <i data-lucide="file-text" class="w-4 h-4 text-rose-600"></i>
-                                Plantillas de Mensajes Valkem
-                            </h4>
-                            
-                            <div class="space-y-3">
-                                <div>
-                                    <label class="block text-xs font-semibold text-stone-600 mb-1">Seleccionar Plantilla:</label>
-                                    <select id="template-select" onchange="loadSelectedTemplate()" class="w-full bg-white border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400 font-medium">
-                                        <option value="confirmacion">1. Confirmación de Cita Valkem</option>
-                                        <option value="recordatorio_24h">2. Recordatorio Cita (24 horas antes)</option>
-                                        <option value="seguimiento_facial">3. Seguimiento Post-Facial (3 días)</option>
-                                        <option value="retoque_21d">4. Recordatorio de Retoque (21 días)</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-xs font-semibold text-stone-600 mb-1">Editar Mensaje:</label>
-                                    <textarea id="template-text-editor" rows="6" onkeyup="saveTemplateChanges()" class="w-full bg-white border border-rose-200 rounded-xl p-3 text-xs focus:ring-2 focus:ring-rose-400 leading-relaxed font-sans"></textarea>
-                                </div>
-
-                                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200/60 text-[11px] text-amber-950 space-y-1">
-                                    <p class="font-bold">Variables dinámicas disponibles:</p>
-                                    <p class="text-amber-900 font-mono"><code>{nombre}</code>, <code>{servicio}</code>, <code>{fecha}</code>, <code>{hora}</code>, <code>{profesional}</code></p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 4: CATÁLOGO DE SERVICIOS -->
-            <section id="view-servicios" class="hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl border border-rose-100 shadow-xs space-y-4">
-                    <div class="flex justify-between items-center border-b border-rose-100 pb-3">
-                        <div>
-                            <h3 class="font-serif font-bold text-stone-800 text-base flex items-center gap-2">
-                                <i data-lucide="sparkle" class="w-5 h-5 text-amber-600"></i>
-                                Catálogo de Servicios & Precios Valkem Beauty SpA
-                            </h3>
-                            <p class="text-xs text-stone-500">Administra los servicios, sus duraciones estimadas y valores</p>
-                        </div>
-                        <button onclick="openNewServiceModal()" class="bg-gradient-to-r from-rose-500 to-amber-600 hover:from-rose-600 hover:to-amber-700 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Nuevo Servicio
-                        </button>
-                    </div>
-
-                    <div id="services-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        <!-- Dynamic Services -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 5: EQUIPO DE TRABAJO -->
-            <section id="view-personal" class="hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl border border-rose-100 shadow-xs space-y-4">
-                    <div class="flex justify-between items-center border-b border-rose-100 pb-3">
-                        <div>
-                            <h3 class="font-serif font-bold text-stone-800 text-base flex items-center gap-2">
-                                <i data-lucide="users-2" class="w-5 h-5 text-rose-600"></i>
-                                Equipo Especialista de Valkem Beauty SpA
-                            </h3>
-                            <p class="text-xs text-stone-500">Tu pareja, manicuristas, cosmetólogas y personal con agenda asignada</p>
-                        </div>
-                        <button onclick="openNewStaffModal()" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 shadow-sm transition border border-amber-500/20">
-                            <i data-lucide="plus" class="w-4 h-4 text-amber-400"></i> Nueva Especialista
-                        </button>
-                    </div>
-
-                    <div id="staff-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic Staff -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- TAB 6: CONFIGURACIÓN & INTEGRACIÓN GITHUB / SUPABASE -->
-            <section id="view-config" class="hidden space-y-6">
-                <div class="glass-panel p-6 rounded-2xl border border-rose-100 shadow-xs space-y-6">
-                    <div>
-                        <h3 class="font-serif font-bold text-stone-800 text-lg flex items-center gap-2">
-                            <i data-lucide="github" class="w-5 h-5 text-valkem-dark"></i>
-                            Guía de Integración con GitHub Actions y Supabase
-                        </h3>
-                        <p class="text-xs text-stone-600 mt-1">Copia y pega estos scripts en tu repositorio de GitHub para automatizar el backend y los envíos diarios de WhatsApp sin costo.</p>
-                    </div>
-
-                    <!-- Sub-tabs Code Blocks -->
-                    <div class="space-y-6">
-                        <!-- Code Box 1: Supabase SQL -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1">
-                                    <i data-lucide="database" class="w-4 h-4 text-emerald-600"></i> 1. Script SQL de Creación en Supabase (Base de Datos)
-                                </label>
-                                <button onclick="copyCodeSnippet('supabase-sql-code')" class="bg-rose-100 hover:bg-rose-200 text-valkem-dark px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar SQL
-                                </button>
-                            </div>
-                            <pre id="supabase-sql-code" class="bg-stone-900 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto border border-stone-800 max-h-56 leading-relaxed"></pre>
-                        </div>
-
-                        <!-- Code Box 2: GitHub Actions Workflow -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1">
-                                    <i data-lucide="workflow" class="w-4 h-4 text-amber-500"></i> 2. GitHub Actions Workflow (.github/workflows/recordatorios.yml)
-                                </label>
-                                <button onclick="copyCodeSnippet('github-action-code')" class="bg-rose-100 hover:bg-rose-200 text-valkem-dark px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar YAML
-                                </button>
-                            </div>
-                            <pre id="github-action-code" class="bg-stone-900 text-amber-300 p-4 rounded-xl text-xs font-mono overflow-x-auto border border-stone-800 max-h-56 leading-relaxed"></pre>
-                        </div>
-
-                        <!-- Code Box 3: Node.js Script -->
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center">
-                                <label class="text-xs font-bold text-stone-800 uppercase tracking-wider flex items-center gap-1">
-                                    <i data-lucide="file-code" class="w-4 h-4 text-sky-400"></i> 3. Script Node.js de Envío Automatizado (scripts/recordatorios.js)
-                                </label>
-                                <button onclick="copyCodeSnippet('nodejs-script-code')" class="bg-rose-100 hover:bg-rose-200 text-valkem-dark px-3 py-1 rounded-lg text-xs font-semibold flex items-center gap-1">
-                                    <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copiar JS
-                                </button>
-                            </div>
-                            <pre id="nodejs-script-code" class="bg-stone-900 text-sky-300 p-4 rounded-xl text-xs font-mono overflow-x-auto border border-stone-800 max-h-56 leading-relaxed"></pre>
-                        </div>
-
-                        <!-- Backup / Restore Actions -->
-                        <div class="pt-4 border-t border-rose-200/80 flex flex-wrap gap-3">
-                            <button onclick="exportDataJSON()" class="bg-stone-800 hover:bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-xs">
-                                <i data-lucide="download" class="w-4 h-4 text-amber-400"></i> Exportar Respaldo de Datos (JSON)
-                            </button>
-                            <button onclick="resetToMockData()" class="bg-rose-100 hover:bg-rose-200 text-rose-800 px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2">
-                                <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Restablecer Datos Demostración
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-        </div>
-    </main>
-
-    <!-- MODAL: NUEVA / EDITAR CITA -->
-    <div id="modal-appointment" class="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-rose-200 animate-in fade-in zoom-in duration-150">
-            <div class="bg-valkem-dark text-white px-6 py-4 flex justify-between items-center border-b border-stone-800">
-                <h3 class="font-serif font-bold text-amber-100 flex items-center gap-2" id="modal-appointment-title">
-                    <i data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i> Agendar Cita en Valkem
-                </h3>
-                <button onclick="closeModal('modal-appointment')" class="text-stone-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            
-            <form onsubmit="saveAppointment(event)" class="p-6 space-y-4">
-                <input type="hidden" id="appointment-id">
-                
-                <!-- Client Select -->
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs font-bold text-stone-700">Clienta Valkem</label>
-                        <button type="button" onclick="closeModal('modal-appointment'); openNewClientModal()" class="text-xs text-rose-600 font-semibold hover:underline">+ Crear Clienta Nueva</button>
-                    </div>
-                    <select id="app-client-id" required class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400 font-medium">
-                        <!-- Dynamic options -->
-                    </select>
-                </div>
-
-                <!-- Service & Staff Select Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Servicio Valkem</label>
-                        <select id="app-service-id" onchange="updateCalculatedEndTime()" required class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400 font-medium">
-                            <!-- Dynamic options -->
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Especialista</label>
-                        <select id="app-staff-id" required class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400 font-medium">
-                            <!-- Dynamic options -->
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Date & Start Time -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Fecha Cita</label>
-                        <input type="date" id="app-date" required class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Hora Inicio</label>
-                        <input type="time" id="app-start-time" onchange="updateCalculatedEndTime()" required class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                    </div>
-                </div>
-
-                <!-- Calculated End Time & Total Price Card -->
-                <div class="bg-rose-50/80 p-3 rounded-xl border border-rose-200 flex justify-between items-center text-xs">
-                    <div>
-                        <span class="text-stone-500">Hora Término Estimada:</span>
-                        <span id="app-calculated-endtime" class="font-bold text-valkem-dark ml-1">--:--</span>
-                    </div>
-                    <div>
-                        <span class="text-stone-500">Valor Total:</span>
-                        <span id="app-calculated-price" class="font-bold text-emerald-700 ml-1">$0</span>
-                    </div>
-                </div>
-
-                <!-- Notes -->
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Notas Rápidas de la Cita</label>
-                    <input type="text" id="app-notes" placeholder="Ej: Tono nude esmalte #12, prefiere atención en silencio..." class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                </div>
-
-                <!-- Modal Actions -->
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-appointment')" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100">Cancelar</button>
-                    <button type="submit" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-5 py-2 rounded-xl text-xs font-semibold shadow-xs border border-amber-500/30">Guardar Cita</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: CLIENTE & FICHA TÉCNICA -->
-    <div id="modal-client" class="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden border border-rose-200">
-            <div class="bg-valkem-dark text-white px-6 py-4 flex justify-between items-center border-b border-stone-800">
-                <h3 class="font-serif font-bold text-amber-100 flex items-center gap-2" id="modal-client-title">
-                    <i data-lucide="user" class="w-5 h-5 text-amber-400"></i> Ficha Técnica de Clienta
-                </h3>
-                <button onclick="closeModal('modal-client')" class="text-stone-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            
-            <form onsubmit="saveClient(event)" class="p-6 space-y-4">
-                <input type="hidden" id="client-id">
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Nombre Completo</label>
-                        <input type="text" id="client-name" required placeholder="Ej: Valentina Silva" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Teléfono WhatsApp</label>
-                        <input type="text" id="client-phone" required placeholder="+56912345678" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400 font-mono">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-rose-800 mb-1 flex items-center gap-1">
-                        <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-rose-500"></i> Alergias y Tipo de Piel
-                    </label>
-                    <textarea id="client-allergies" rows="2" placeholder="Ej: Piel sensible, alergia al acrilato o látex..." class="w-full border border-rose-200 bg-rose-50/30 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-amber-900 mb-1 flex items-center gap-1">
-                        <i data-lucide="heart" class="w-3.5 h-3.5 text-amber-600"></i> Preferencias de Estilo & Tonos
-                    </label>
-                    <textarea id="client-preferences" rows="2" placeholder="Ej: Tonos rosados nudes, curvatura pestañas D, café helado sin azúcar..." class="w-full border border-rose-200 bg-amber-50/20 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Historial Tratamientos Anteriores</label>
-                    <textarea id="client-notes" rows="2" placeholder="Ej: Realizado peeling hace 1 mes, prefiere manicura rusa cada 20 días..." class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400"></textarea>
-                </div>
-
-                <!-- Modal Actions -->
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-client')" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100">Cancelar</button>
-                    <button type="submit" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-5 py-2 rounded-xl text-xs font-semibold shadow-xs border border-amber-500/30">Guardar Clienta</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: SERVICIO -->
-    <div id="modal-service" class="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-rose-200">
-            <div class="bg-valkem-dark text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-serif font-bold text-amber-100 flex items-center gap-2">
-                    <i data-lucide="sparkle" class="w-5 h-5 text-amber-400"></i> Registrar Nuevo Servicio
-                </h3>
-                <button onclick="closeModal('modal-service')" class="text-stone-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            
-            <form onsubmit="saveService(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Nombre del Servicio</label>
-                    <input type="text" id="service-name" required placeholder="Ej: Manicura Rusa Valkem" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Duración (Mins)</label>
-                        <input type="number" id="service-duration" required placeholder="60" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-stone-700 mb-1">Precio ($ CLP)</label>
-                        <input type="number" id="service-price" required placeholder="25000" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-service')" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100">Cancelar</button>
-                    <button type="submit" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-5 py-2 rounded-xl text-xs font-semibold shadow-xs">Guardar Servicio</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: PERSONAL -->
-    <div id="modal-staff" class="fixed inset-0 bg-stone-950/60 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-rose-200">
-            <div class="bg-valkem-dark text-white px-6 py-4 flex justify-between items-center">
-                <h3 class="font-serif font-bold text-amber-100 flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-5 h-5 text-amber-400"></i> Registrar Integrante
-                </h3>
-                <button onclick="closeModal('modal-staff')" class="text-stone-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            
-            <form onsubmit="saveStaff(event)" class="p-6 space-y-4">
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Nombre Completo</label>
-                    <input type="text" id="staff-name" required placeholder="Ej: Camila Soto" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Especialidad Principal</label>
-                    <input type="text" id="staff-specialty" required placeholder="Ej: Manicura Rusa & Acrílicas" class="w-full border border-rose-200 rounded-xl p-2.5 text-xs focus:ring-2 focus:ring-rose-400">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-stone-700 mb-1">Color Etiqueta Agenda</label>
-                    <input type="color" id="staff-color" value="#e0a96d" class="w-full h-10 border border-rose-200 rounded-xl p-1 cursor-pointer">
-                </div>
-
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeModal('modal-staff')" class="px-4 py-2 rounded-xl text-xs font-semibold text-stone-600 hover:bg-stone-100">Cancelar</button>
-                    <button type="submit" class="bg-valkem-dark hover:bg-stone-900 text-valkem-roseGoldLight px-5 py-2 rounded-xl text-xs font-semibold shadow-xs">Guardar Integrante</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- TOAST NOTIFICATION CONTAINER -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <script>
-        
-        // Default Mock Data for Valkem Beauty SpA
-        const DEFAULT_SERVICES = [
-            { id: 'srv-1', name: 'Manicura Rusa + Esmaltado Permanente', duration: 75, price: 25000 },
-            { id: 'srv-2', name: 'Uñas Acrílicas - Set Esculpidas Valkem', duration: 120, price: 42000 },
-            { id: 'srv-3', name: 'Limpieza Facial Profunda Valkem Glow', duration: 90, price: 38000 },
-            { id: 'srv-4', name: 'Lifting & Tinte de Pestañas', duration: 60, price: 28000 },
-            { id: 'srv-5', name: 'Relleno & Mantenimiento Acrílico', duration: 90, price: 30000 },
-            { id: 'srv-6', name: 'Peeling Facial Regenerador', duration: 60, price: 35000 }
-        ];
-
-        const DEFAULT_STAFF = [
-            { id: 'stf-1', name: 'Valeria (Tu Pareja)', specialty: 'Especialista Senior / Admin', color: '#be123c' },
-            { id: 'stf-2', name: 'Camila Soto', specialty: 'Manicurista & Acrílicas', color: '#9333ea' },
-            { id: 'stf-3', name: 'Valentina Reyes', specialty: 'Cosmetología & Lash Artist', color: '#d97706' }
-        ];
-
-        const DEFAULT_CLIENTS = [
-            { 
-                id: 'cli-1', 
-                name: 'María González', 
-                phone: '+56987654321', 
-                allergies: 'Sensibilidad suave al acrilato y látex.', 
-                preferences: 'Prefiere tonos nudes rosados y café claro. Le agrada música suave.', 
-                notes: 'Asiste cada 3 semanas. Pide citas preferentemente los viernes.' 
-            },
-            { 
-                id: 'cli-2', 
-                name: 'Andrea Morales', 
-                phone: '+56976543210', 
-                allergies: 'Sin alergias reportadas.', 
-                preferences: 'Usa curvatura D en pestañas. Le fascinan los tonos rojo vino.', 
-                notes: 'Puntual. Le gusta recibir avisos de retoque a los 20 días.' 
-            },
-            { 
-                id: 'cli-3', 
-                name: 'Carolina Fuentes', 
-                phone: '+56965432109', 
-                allergies: 'Sensibilidad a ácido salicílico en concentraciones altas.', 
-                preferences: 'Piel grasa con tendencia a deshidratación. Tratamientos con alta frecuencia.', 
-                notes: 'Clienta habitual desde 2025.' 
-            }
-        ];
-
-        const DEFAULT_TEMPLATES = {
-            confirmacion: "¡Hola {nombre}! ✨ Tu cita para {servicio} en Valkem Beauty SpA ha sido confirmada con {profesional} para el {fecha} a las {hora}. ¡Nos emociona atenderte! 🌸",
-            recordatorio_24h: "¡Hola {nombre}! 💖 Te recordamos tu cita de mañana {fecha} a las {hora} para {servicio} con {profesional} en Valkem Beauty SpA. Por favor confirma tu asistencia respondiendo este mensaje. 💅",
-            seguimiento_facial: "¡Hola {nombre}! ✨ Han pasado 3 días desde tu {servicio} en Valkem Beauty SpA. ¿Cómo ha evolucionado tu piel? Cuéntanos si tienes alguna duda sobre tus cuidados. 🌿",
-            retoque_21d: "¡Hola {nombre}! 💎 Ya han pasado 3 semanas desde tu último {servicio} en Valkem Beauty SpA. ¡Es el momento perfecto para tu retoque! ¿Te agendamos un espacio esta semana? 📲"
-        };
-
-        // Application State Store
-        let services = JSON.parse(localStorage.getItem('valkem_services')) || DEFAULT_SERVICES;
-        let staff = JSON.parse(localStorage.getItem('valkem_staff')) || DEFAULT_STAFF;
-        let clients = JSON.parse(localStorage.getItem('valkem_clients')) || DEFAULT_CLIENTS;
-        let templates = JSON.parse(localStorage.getItem('valkem_templates')) || DEFAULT_TEMPLATES;
-        let appointments = JSON.parse(localStorage.getItem('valkem_appointments')) || [];
-
-        let currentStaffFilter = 'all';
-
-        // Seed Appointments for TODAY if state is empty
-        function seedAppointmentsIfEmpty() {
-            if (appointments.length === 0) {
-                const todayStr = new Date().toISOString().split('T')[0];
-                appointments = [
-                    {
-                        id: 'app-201',
-                        clientId: 'cli-1',
-                        serviceId: 'srv-1',
-                        staffId: 'stf-1',
-                        date: todayStr,
-                        startTime: '10:00',
-                        endTime: '11:15',
-                        status: 'confirmada',
-                        price: 25000,
-                        notes: 'Manicura Rusa tono rosa nude',
-                        reminderSent: false
-                    },
-                    {
-                        id: 'app-202',
-                        clientId: 'cli-2',
-                        serviceId: 'srv-3',
-                        staffId: 'stf-3',
-                        date: todayStr,
-                        startTime: '11:30',
-                        endTime: '13:00',
-                        status: 'completada',
-                        price: 38000,
-                        notes: 'Limpieza facial profunda con mascarilla LED',
-                        reminderSent: true
-                    },
-                    {
-                        id: 'app-203',
-                        clientId: 'cli-3',
-                        serviceId: 'srv-4',
-                        staffId: 'stf-2',
-                        date: todayStr,
-                        startTime: '15:30',
-                        endTime: '16:30',
-                        status: 'confirmada',
-                        price: 28000,
-                        notes: 'Lifting de pestañas',
-                        reminderSent: false
-                    }
-                ];
-                saveState();
-            }
-        }
-
-        function saveState() {
-            localStorage.setItem('valkem_services', JSON.stringify(services));
-            localStorage.setItem('valkem_staff', JSON.stringify(staff));
-            localStorage.setItem('valkem_clients', JSON.stringify(clients));
-            localStorage.setItem('valkem_templates', JSON.stringify(templates));
-            localStorage.setItem('valkem_appointments', JSON.stringify(appointments));
-            updateHeaderCounters();
-        }
-
-        window.onload = function() {
-            seedAppointmentsIfEmpty();
-            document.getElementById('agenda-date-picker').value = new Date().toISOString().split('T')[0];
-            document.getElementById('current-date-text').textContent = new Date().toLocaleDateString('es-CL', { weekday: 'short', day: 'numeric', month: 'short' });
-            
-            renderStaffFilterButtons();
-            renderAgenda();
-            renderClients();
-            renderWhatsAppQueue();
-            renderServicesAndStaff();
-            generateBackendScripts();
-            updateHeaderCounters();
-            
-            lucide.createIcons();
-        };
-
-        function updateHeaderCounters() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const todaysApps = appointments.filter(a => a.date === todayStr);
-            document.getElementById('top-stat-citas').textContent = todaysApps.length;
-            document.getElementById('top-stat-clientes').textContent = clients.length;
-        }
-
-        function switchTab(tabId) {
-            const tabs = ['agenda', 'clientes', 'whatsapp', 'servicios', 'personal', 'config'];
-            const titles = {
-                agenda: 'Agenda y Citas Valkem Beauty SpA',
-                clientes: 'Fichas Técnicas & Clientes Valkem',
-                whatsapp: 'Centro de Seguimiento WhatsApp',
-                servicios: 'Catálogo de Servicios & Precios',
-                personal: 'Equipo de Especialistas',
-                config: 'Código Backend GitHub & Supabase'
-            };
-
-            tabs.forEach(tab => {
-                const viewEl = document.getElementById(`view-${tab}`);
-                const navEl = document.getElementById(`nav-${tab}`);
-                if (viewEl) viewEl.classList.add('hidden');
-                if (navEl) {
-                    navEl.classList.remove('active');
-                    navEl.classList.add('text-stone-300');
-                }
-            });
-
-            const currentView = document.getElementById(`view-${tabId}`);
-            const currentNav = document.getElementById(`nav-${tabId}`);
-            if (currentView) currentView.classList.remove('hidden');
-            if (currentNav) {
-                currentNav.classList.add('active');
-                currentNav.classList.remove('text-stone-300');
-            }
-            
-            document.getElementById('page-title').textContent = titles[tabId];
-            
-            if (tabId === 'agenda') renderAgenda();
-            if (tabId === 'clientes') renderClients();
-            if (tabId === 'whatsapp') renderWhatsAppQueue();
-            if (tabId === 'servicios' || tabId === 'personal') renderServicesAndStaff();
-            
-            lucide.createIcons();
-        }
-
-        function setAgendaToday() {
-            document.getElementById('agenda-date-picker').value = new Date().toISOString().split('T')[0];
-            renderAgenda();
-        }
-
-        function renderStaffFilterButtons() {
-            const container = document.getElementById('staff-filter-container');
-            let html = `
-                <button onclick="filterByStaff('all')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${currentStaffFilter === 'all' ? 'bg-valkem-dark text-valkem-roseGoldLight border-valkem-dark' : 'bg-white text-stone-700 border-rose-200 hover:bg-rose-50'}">
-                    Todas las Agendas
-                </button>
-            `;
-
-            staff.forEach(stf => {
-                const isActive = currentStaffFilter === stf.id;
-                html += `
-                    <button onclick="filterByStaff('${stf.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition ${isActive ? 'bg-valkem-dark text-valkem-roseGoldLight border-valkem-dark' : 'bg-white text-stone-700 border-rose-200 hover:bg-rose-50'}">
-                        <span class="w-2.5 h-2.5 rounded-full" style="background-color: ${stf.color}"></span>
-                        <span>${stf.name.split(' ')[0]}</span>
-                    </button>
-                `;
-            });
-
-            container.innerHTML = html;
-        }
-
-        function filterByStaff(staffId) {
-            currentStaffFilter = staffId;
-            renderStaffFilterButtons();
-            renderAgenda();
-        }
-
-        function renderAgenda() {
-            const selectedDate = document.getElementById('agenda-date-picker').value;
-            const container = document.getElementById('timeline-slots-container');
-            
-            let dayApps = appointments.filter(a => a.date === selectedDate);
-            if (currentStaffFilter !== 'all') {
-                dayApps = dayApps.filter(a => a.staffId === currentStaffFilter);
-            }
-
-            dayApps.sort((a, b) => a.startTime.localeCompare(b.startTime));
-
-            document.getElementById('agenda-count-badge').textContent = `${dayApps.length} citas hoy`;
-
-            let revenue = 0;
-            let confirmed = 0;
-            let completed = 0;
-            let canceled = 0;
-
-            dayApps.forEach(a => {
-                if (a.status === 'completada') revenue += Number(a.price);
-                if (a.status === 'confirmada') confirmed++;
-                if (a.status === 'completada') completed++;
-                if (a.status === 'cancelada') canceled++;
-            });
-
-            document.getElementById('daily-revenue').textContent = `$${revenue.toLocaleString('es-CL')} CLP`;
-            document.getElementById('stat-confirmed-count').textContent = confirmed;
-            document.getElementById('stat-completed-count').textContent = completed;
-            document.getElementById('stat-canceled-count').textContent = canceled;
-
-            if (dayApps.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 border-2 border-dashed border-rose-200 rounded-2xl bg-rose-50/20 space-y-2">
-                        <i data-lucide="calendar-x" class="w-10 h-10 mx-auto text-rose-300"></i>
-                        <p class="text-sm font-semibold text-stone-600">No hay citas agendadas para esta fecha o especialista.</p>
-                        <button onclick="openNewAppointmentModal()" class="text-xs bg-valkem-dark text-valkem-roseGoldLight px-4 py-2 rounded-xl font-bold hover:bg-stone-900 transition flex items-center gap-1 mx-auto mt-2">
-                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Agendar Nueva Cita
-                        </button>
-                    </div>
-                `;
-                lucide.createIcons();
-                renderMiniReminders();
-                return;
-            }
-
-            let html = '';
-            dayApps.forEach(app => {
-                const client = clients.find(c => c.id === app.clientId) || { name: 'Clienta Desconocida', phone: '' };
-                const service = services.find(s => s.id === app.serviceId) || { name: 'Servicio Valkem', duration: 0 };
-                const stf = staff.find(s => s.id === app.staffId) || { name: 'Especialista', color: '#888' };
-
-                const statusStyles = {
-                    confirmada: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-                    completada: 'bg-sky-50 text-sky-800 border-sky-200',
-                    cancelada: 'bg-rose-50 text-rose-800 border-rose-200'
-                };
-
-                html += `
-                    <div class="bg-white border border-rose-100 p-4 rounded-xl shadow-xs hover:shadow-md transition flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div class="flex items-start gap-3">
-                            <div class="text-center bg-stone-900 text-valkem-roseGoldLight px-3 py-2 rounded-xl border border-amber-500/30 min-w-[75px]">
-                                <span class="block text-xs font-bold font-mono">${app.startTime}</span>
-                                <span class="text-[10px] text-stone-400 font-mono">a ${app.endTime}</span>
-                            </div>
-                            <div class="space-y-1">
-                                <div class="flex items-center gap-2">
-                                    <h4 class="font-bold text-sm text-stone-800">${client.name}</h4>
-                                    <span class="text-[10px] px-2 py-0.5 rounded-full border ${statusStyles[app.status]} capitalize font-bold">${app.status}</span>
-                                </div>
-                                <p class="text-xs text-amber-900 font-medium">${service.name} • <span class="text-emerald-700 font-semibold">$${Number(app.price).toLocaleString('es-CL')} CLP</span></p>
-                                <div class="flex items-center gap-2 text-[11px] text-stone-500">
-                                    <span class="flex items-center gap-1 font-semibold" style="color: ${stf.color}">
-                                        <i data-lucide="user" class="w-3 h-3"></i> ${stf.name}
-                                    </span>
-                                    ${app.notes ? `• <span class="italic text-stone-500">"${app.notes}"</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="flex items-center gap-2 w-full sm:w-auto justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-stone-100">
-                            <button onclick="triggerQuickWhatsApp('${app.id}')" title="Enviar WhatsApp Valkem" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow-xs">
-                                <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> WA
-                            </button>
-                            
-                            <select onchange="updateAppointmentStatus('${app.id}', this.value)" class="text-xs bg-stone-50 border border-stone-200 rounded-lg p-1.5 focus:ring-1 focus:ring-rose-400 font-semibold">
-                                <option value="confirmada" ${app.status === 'confirmada' ? 'selected' : ''}>Confirmada</option>
-                                <option value="completada" ${app.status === 'completada' ? 'selected' : ''}>Completada</option>
-                                <option value="cancelada" ${app.status === 'cancelada' ? 'selected' : ''}>Cancelada</option>
-                            </select>
-
-                            <button onclick="deleteAppointment('${app.id}')" title="Eliminar Cita" class="p-1.5 text-rose-400 hover:text-rose-600 rounded-lg text-xs transition">
-                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            renderMiniReminders();
-            lucide.createIcons();
-        }
-
-        function renderMiniReminders() {
-            const container = document.getElementById('mini-reminders-list');
-            const pending = appointments.filter(a => !a.reminderSent && a.status === 'confirmada').slice(0, 3);
-
-            if (pending.length === 0) {
-                container.innerHTML = `<p class="text-stone-400 italic">No hay recordatorios pendientes para hoy.</p>`;
-                return;
-            }
-
-            let html = '';
-            pending.forEach(app => {
-                const client = clients.find(c => c.id === app.clientId) || { name: 'Clienta' };
-                html += `
-                    <div class="flex justify-between items-center bg-rose-50/60 p-2 rounded-xl border border-rose-100">
-                        <div>
-                            <p class="font-bold text-stone-800">${client.name}</p>
-                            <p class="text-[10px] text-stone-500">${app.date} @ ${app.startTime}</p>
-                        </div>
-                        <button onclick="switchTab('whatsapp')" class="text-[10px] bg-valkem-dark text-valkem-roseGoldLight px-2 py-1 rounded font-semibold hover:bg-stone-900">Enviar WA</button>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-        }
-
-        function updateAppointmentStatus(appId, newStatus) {
-            const app = appointments.find(a => a.id === appId);
-            if (app) {
-                app.status = newStatus;
-                saveState();
-                renderAgenda();
-                showToast(`Estado actualizado a ${newStatus}`);
-            }
-        }
-
-        function deleteAppointment(appId) {
-            appointments = appointments.filter(a => a.id !== appId);
-            saveState();
-            renderAgenda();
-            showToast('Cita eliminada correctamente');
-        }
-
-        function renderClients() {
-            const search = (document.getElementById('client-search-input')?.value || '').toLowerCase();
-            const container = document.getElementById('clients-grid');
-
-            const filtered = clients.filter(c => 
-                c.name.toLowerCase().includes(search) || 
-                c.phone.toLowerCase().includes(search) ||
-                (c.allergies && c.allergies.toLowerCase().includes(search)) ||
-                (c.preferences && c.preferences.toLowerCase().includes(search))
-            );
-
-            if (filtered.length === 0) {
-                container.innerHTML = `
-                    <div class="col-span-full text-center py-12 glass-panel rounded-2xl">
-                        <i data-lucide="users-2" class="w-10 h-10 mx-auto text-rose-300 mb-2"></i>
-                        <p class="text-sm font-semibold text-stone-600">No se encontraron clientas en el directorio.</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            let html = '';
-            filtered.forEach(cli => {
-                const clientApps = appointments.filter(a => a.clientId === cli.id);
-                const lastApp = clientApps.sort((a, b) => b.date.localeCompare(a.date))[0];
-
-                html += `
-                    <div class="bg-white border border-rose-100 rounded-2xl p-5 shadow-xs hover:shadow-md transition space-y-3">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h4 class="font-serif font-bold text-stone-800 text-base">${cli.name}</h4>
-                                <p class="text-xs text-stone-500 font-mono flex items-center gap-1 mt-0.5">
-                                    <i data-lucide="phone" class="w-3 h-3 text-emerald-600"></i> ${cli.phone}
-                                </p>
-                            </div>
-                            <span class="bg-rose-100 text-rose-900 text-xs px-2.5 py-1 rounded-full font-bold">
-                                ${clientApps.length} visitas
-                            </span>
-                        </div>
-
-                        <!-- Technical File Sections -->
-                        <div class="space-y-2 text-xs">
-                            <div class="bg-rose-50/70 border border-rose-100 p-2.5 rounded-xl">
-                                <span class="font-bold text-rose-900 block mb-0.5 flex items-center gap-1">
-                                    <i data-lucide="alert-triangle" class="w-3 h-3 text-rose-600"></i> Alergias / Sensibilidades:
-                                </span>
-                                <p class="text-stone-700">${cli.allergies || 'Sin alergias registradas'}</p>
-                            </div>
-                            <div class="bg-amber-50/50 border border-amber-100 p-2.5 rounded-xl">
-                                <span class="font-bold text-amber-950 block mb-0.5 flex items-center gap-1">
-                                    <i data-lucide="heart" class="w-3 h-3 text-amber-600"></i> Preferencias & Tonos:
-                                </span>
-                                <p class="text-stone-700">${cli.preferences || 'Sin preferencias registradas'}</p>
-                            </div>
-                        </div>
-
-                        <div class="text-[11px] text-stone-400 flex justify-between items-center border-t border-stone-100 pt-3">
-                            <span>Última cita: ${lastApp ? lastApp.date : 'Sin registro'}</span>
-                            <div class="flex gap-2">
-                                <button onclick="openEditClientModal('${cli.id}')" class="text-valkem-dark hover:underline font-semibold text-xs">Editar Ficha</button>
-                                <button onclick="openDirectWhatsApp('${cli.phone}', '¡Hola ${cli.name}! Te escribimos de Valkem Beauty SpA.')" class="text-emerald-600 font-bold hover:underline flex items-center gap-1 text-xs">
-                                    <i data-lucide="message-square" class="w-3 h-3"></i> WA
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            lucide.createIcons();
-        }
-
-        function renderWhatsAppQueue() {
-            const container = document.getElementById('whatsapp-queue-container');
-            const pendingApps = appointments.filter(a => a.status === 'confirmada');
-
-            document.getElementById('pending-whatsapp-badge').textContent = pendingApps.filter(a => !a.reminderSent).length;
-
-            if (pendingApps.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-10 bg-rose-50/30 rounded-xl border border-dashed border-rose-200">
-                        <p class="text-xs text-stone-500 font-semibold">No hay mensajes en cola actualmente.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            let html = '';
-            pendingApps.forEach(app => {
-                const client = clients.find(c => c.id === app.clientId) || { name: 'Clienta Valkem', phone: '' };
-                const service = services.find(s => s.id === app.serviceId) || { name: 'Servicio Valkem' };
-                const stf = staff.find(s => s.id === app.staffId) || { name: 'Especialista' };
-
-                const messageText = templates.recordatorio_24h
-                    .replace('{nombre}', client.name)
-                    .replace('{servicio}', service.name)
-                    .replace('{fecha}', app.date)
-                    .replace('{hora}', app.startTime)
-                    .replace('{profesional}', stf.name);
-
-                html += `
-                    <div class="bg-white border border-rose-100 p-4 rounded-xl shadow-xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <div class="space-y-1">
-                            <div class="flex items-center gap-2">
-                                <h4 class="font-bold text-sm text-stone-800">${client.name}</h4>
-                                <span class="text-[10px] font-mono text-stone-500">${client.phone}</span>
-                                ${app.reminderSent ? '<span class="bg-emerald-100 text-emerald-800 text-[10px] px-2 py-0.5 rounded font-bold">Enviado</span>' : '<span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded font-bold">Pendiente</span>'}
-                            </div>
-                            <p class="text-xs text-stone-600">Cita: <span class="font-semibold text-valkem-dark">${service.name}</span> el ${app.date} a las ${app.startTime}</p>
-                            <p class="text-[11px] text-stone-600 bg-stone-50 p-2.5 rounded-lg italic border border-stone-100">"${messageText}"</p>
-                        </div>
-
-                        <div class="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end">
-                            <button onclick="sendWhatsAppReminder('${app.id}', '${client.phone}', \`${encodeURIComponent(messageText)}\`)" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition">
-                                <i data-lucide="send" class="w-3.5 h-3.5"></i> Abrir WhatsApp
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            container.innerHTML = html;
-            loadSelectedTemplate();
-            lucide.createIcons();
-        }
-
-        function loadSelectedTemplate() {
-            const type = document.getElementById('template-select').value;
-            document.getElementById('template-text-editor').value = templates[type] || '';
-        }
-
-        function saveTemplateChanges() {
-            const type = document.getElementById('template-select').value;
-            templates[type] = document.getElementById('template-text-editor').value;
-            saveState();
-        }
-
-        function sendWhatsAppReminder(appId, phone, encodedMsg) {
-            const app = appointments.find(a => a.id === appId);
-            if (app) {
-                app.reminderSent = true;
-                saveState();
-                renderWhatsAppQueue();
-            }
-            openDirectWhatsApp(phone, decodeURIComponent(encodedMsg));
-        }
-
-        function triggerQuickWhatsApp(appId) {
-            const app = appointments.find(a => a.id === appId);
-            if (!app) return;
-            const client = clients.find(c => c.id === app.clientId);
-            const service = services.find(s => s.id === app.serviceId);
-            const stf = staff.find(s => s.id === app.staffId);
-
-            const msg = templates.confirmacion
-                .replace('{nombre}', client.name)
-                .replace('{servicio}', service.name)
-                .replace('{fecha}', app.date)
-                .replace('{hora}', app.startTime)
-                .replace('{profesional}', stf.name);
-
-            openDirectWhatsApp(client.phone, msg);
-        }
-
-        function openDirectWhatsApp(phone, text) {
-            const cleanPhone = phone.replace(/[^0-9]/g, '');
-            window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`, '_blank');
-        }
-
-        function renderServicesAndStaff() {
-            // Services
-            const srvContainer = document.getElementById('services-list-container');
-            let srvHtml = '';
-            services.forEach(s => {
-                srvHtml += `
-                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-rose-100">
-                        <div>
-                            <h4 class="font-bold text-xs text-stone-800">${s.name}</h4>
-                            <span class="text-[11px] text-stone-400 font-mono">${s.duration} mins de atención</span>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-xs text-emerald-700">$${Number(s.price).toLocaleString('es-CL')} CLP</span>
-                            <button onclick="deleteService('${s.id}')" class="text-rose-400 hover:text-rose-600 text-xs p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                        </div>
-                    </div>
-                `;
-            });
-            srvContainer.innerHTML = srvHtml;
-
-            // Staff
-            const stfContainer = document.getElementById('staff-list-container');
-            let stfHtml = '';
-            staff.forEach(st => {
-                stfHtml += `
-                    <div class="flex justify-between items-center bg-white p-3.5 rounded-xl border border-rose-100">
-                        <div class="flex items-center gap-3">
-                            <span class="w-3.5 h-3.5 rounded-full shrink-0" style="background-color: ${st.color}"></span>
-                            <div>
-                                <h4 class="font-bold text-xs text-stone-800">${st.name}</h4>
-                                <span class="text-[11px] text-stone-400">${st.specialty}</span>
-                            </div>
-                        </div>
-                        <button onclick="deleteStaff('${st.id}')" class="text-rose-400 hover:text-rose-600 text-xs p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
-                    </div>
-                `;
-            });
-            stfContainer.innerHTML = stfHtml;
-            lucide.createIcons();
-        }
-
-        function deleteService(id) {
-            services = services.filter(s => s.id !== id);
-            saveState();
-            renderServicesAndStaff();
-            showToast('Servicio eliminado');
-        }
-
-        function deleteStaff(id) {
-            staff = staff.filter(st => st.id !== id);
-            saveState();
-            renderServicesAndStaff();
-            renderStaffFilterButtons();
-            showToast('Integrante eliminada');
-        }
-
-        // Modal Helpers & Save Functions
-        function openNewAppointmentModal() {
-            document.getElementById('appointment-id').value = '';
-            document.getElementById('modal-appointment-title').innerHTML = `<i data-lucide="calendar-plus" class="w-5 h-5 text-amber-400"></i> Agendar Cita Valkem`;
-            
-            const clientSelect = document.getElementById('app-client-id');
-            clientSelect.innerHTML = clients.map(c => `<option value="${c.id}">${c.name} (${c.phone})</option>`).join('');
-
-            const serviceSelect = document.getElementById('app-service-id');
-            serviceSelect.innerHTML = services.map(s => `<option value="${s.id}">${s.name} - $${Number(s.price).toLocaleString('es-CL')} CLP</option>`).join('');
-
-            const staffSelect = document.getElementById('app-staff-id');
-            staffSelect.innerHTML = staff.map(st => `<option value="${st.id}">${st.name} (${st.specialty})</option>`).join('');
-
-            document.getElementById('app-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('app-start-time').value = '10:00';
-            
-            updateCalculatedEndTime();
-            openModal('modal-appointment');
-        }
-
-        function updateCalculatedEndTime() {
-            const serviceId = document.getElementById('app-service-id').value;
-            const startTime = document.getElementById('app-start-time').value;
-            const service = services.find(s => s.id === serviceId);
-
-            if (!service || !startTime) return;
-
-            const [hours, minutes] = startTime.split(':').map(Number);
-            const end = new Date(2026, 0, 1, hours, minutes + Number(service.duration));
-            const endStr = `${String(end.getHours()).padStart(2, '0')}:${String(end.getMinutes()).padStart(2, '0')}`;
-
-            document.getElementById('app-calculated-endtime').textContent = endStr;
-            document.getElementById('app-calculated-price').textContent = `$${Number(service.price).toLocaleString('es-CL')} CLP`;
-        }
-
-        function saveAppointment(e) {
-            e.preventDefault();
-            const serviceId = document.getElementById('app-service-id').value;
-            const service = services.find(s => s.id === serviceId);
-
-            const newApp = {
-                id: document.getElementById('appointment-id').value || `app-${Date.now()}`,
-                clientId: document.getElementById('app-client-id').value,
-                serviceId: serviceId,
-                staffId: document.getElementById('app-staff-id').value,
-                date: document.getElementById('app-date').value,
-                startTime: document.getElementById('app-start-time').value,
-                endTime: document.getElementById('app-calculated-endtime').textContent,
-                status: 'confirmada',
-                price: service ? service.price : 0,
-                notes: document.getElementById('app-notes').value,
-                reminderSent: false
-            };
-
-            appointments.push(newApp);
-            saveState();
-            closeModal('modal-appointment');
-            renderAgenda();
-            renderWhatsAppQueue();
-            showToast('Cita agendada con éxito en Valkem');
-        }
-
-        function openNewClientModal() {
-            document.getElementById('client-id').value = '';
-            document.getElementById('client-name').value = '';
-            document.getElementById('client-phone').value = '+569';
-            document.getElementById('client-allergies').value = '';
-            document.getElementById('client-preferences').value = '';
-            document.getElementById('client-notes').value = '';
-            openModal('modal-client');
-        }
-
-        function openEditClientModal(clientId) {
-            const cli = clients.find(c => c.id === clientId);
-            if (!cli) return;
-
-            document.getElementById('client-id').value = cli.id;
-            document.getElementById('client-name').value = cli.name;
-            document.getElementById('client-phone').value = cli.phone;
-            document.getElementById('client-allergies').value = cli.allergies || '';
-            document.getElementById('client-preferences').value = cli.preferences || '';
-            document.getElementById('client-notes').value = cli.notes || '';
-            openModal('modal-client');
-        }
-
-        function saveClient(e) {
-            e.preventDefault();
-            const id = document.getElementById('client-id').value;
-            const clientData = {
-                id: id || `cli-${Date.now()}`,
-                name: document.getElementById('client-name').value,
-                phone: document.getElementById('client-phone').value,
-                allergies: document.getElementById('client-allergies').value,
-                preferences: document.getElementById('client-preferences').value,
-                notes: document.getElementById('client-notes').value
-            };
-
-            if (id) {
-                const index = clients.findIndex(c => c.id === id);
-                if (index !== -1) clients[index] = clientData;
-            } else {
-                clients.push(clientData);
-            }
-
-            saveState();
-            closeModal('modal-client');
-            renderClients();
-            showToast('Ficha de clienta guardada');
-        }
-
-        function openNewServiceModal() {
-            document.getElementById('service-name').value = '';
-            document.getElementById('service-duration').value = '60';
-            document.getElementById('service-price').value = '25000';
-            openModal('modal-service');
-        }
-
-        function saveService(e) {
-            e.preventDefault();
-            const serviceData = {
-                id: `srv-${Date.now()}`,
-                name: document.getElementById('service-name').value,
-                duration: Number(document.getElementById('service-duration').value),
-                price: Number(document.getElementById('service-price').value)
-            };
-
-            services.push(serviceData);
-            saveState();
-            closeModal('modal-service');
-            renderServicesAndStaff();
-            showToast('Nuevo servicio añadido');
-        }
-
-        function openNewStaffModal() {
-            document.getElementById('staff-name').value = '';
-            document.getElementById('staff-specialty').value = '';
-            openModal('modal-staff');
-        }
-
-        function saveStaff(e) {
-            e.preventDefault();
-            const staffData = {
-                id: `stf-${Date.now()}`,
-                name: document.getElementById('staff-name').value,
-                specialty: document.getElementById('staff-specialty').value,
-                color: document.getElementById('staff-color').value
-            };
-
-            staff.push(staffData);
-            saveState();
-            closeModal('modal-staff');
-            renderServicesAndStaff();
-            renderStaffFilterButtons();
-            showToast('Especialista agregada al equipo');
-        }
-
-        function openModal(id) {
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        function showToast(message) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'bg-stone-900 text-valkem-roseGoldLight px-4 py-2.5 rounded-xl shadow-lg border border-amber-500/30 text-xs font-semibold animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto flex items-center gap-2';
-            toast.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> ${message}`;
-            container.appendChild(toast);
-            lucide.createIcons();
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function generateBackendScripts() {
-            // 1. Supabase SQL Schema
-            const sql = `-- VALKEM BEAUTY SpA - BASE DE DATOS SUPABASE
--- Ejecutar en el SQL Editor de Supabase (Gratuito)
-
-CREATE TABLE IF NOT EXISTS personal (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    nombre VARCHAR NOT NULL,
-    especialidad VARCHAR,
-    color VARCHAR DEFAULT '#be123c',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS clientes (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    nombre VARCHAR NOT NULL,
-    telefono VARCHAR NOT NULL,
-    alergias TEXT,
-    preferencias TEXT,
-    notas TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-);
-
-CREATE TABLE IF NOT EXISTS servicios (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    nombre VARCHAR NOT NULL,
-    duracion_minutos INT NOT NULL,
-    precio DECIMAL(10,2) NOT NULL
-);
-
-CREATE TABLE IF NOT EXISTS citas (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    cliente_id UUID REFERENCES clientes(id) ON DELETE CASCADE,
-    personal_id UUID REFERENCES personal(id),
-    servicio_id UUID REFERENCES servicios(id),
-    fecha DATE NOT NULL,
-    hora_inicio TIME NOT NULL,
-    hora_fin TIME NOT NULL,
-    estado VARCHAR DEFAULT 'confirmada',
-    precio DECIMAL(10,2),
-    recordatorio_enviado BOOLEAN DEFAULT false,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
-);`;
-
-            // 2. GitHub Actions YAML Workflow
-            const yaml = `# ARCHIVO: .github/workflows/recordatorios.yml
-name: Envíos Automáticos de WhatsApp Valkem Beauty SpA
-
-on:
-  schedule:
-    # Se ejecuta todos los días a las 09:00 AM hora local
-    - cron: '0 12 * * *'
-  workflow_dispatch:
-
-jobs:
-  enviar-recordatorios:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout del Repositorio
-        uses: actions/checkout@v3
-
-      - name: Configurar Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Instalar Dependencias
-        run: npm install @supabase/supabase-js axios
-
-      - name: Ejecutar Script de Recordatorios
-        env:
-          SUPABASE_URL: \${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: \${{ secrets.SUPABASE_KEY }}
-          WHATSAPP_TOKEN: \${{ secrets.WHATSAPP_TOKEN }}
-        run: node scripts/recordatorios.js`;
-
-            // 3. Node.js Automation Script
-            const nodejs = `// ARCHIVO: scripts/recordatorios.js
-const { createClient } = require('@supabase/supabase-js');
-const axios = require('axios');
-
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
-
-async function enviarRecordatoriosDiarios() {
-    console.log('Buscando citas de mañana para Valkem Beauty SpA...');
-    
-    const mañana = new Date();
-    mañana.setDate(mañana.getDate() + 1);
-    const fechaMañanaStr = mañana.toISOString().split('T')[0];
-
-    const { data: citas, error } = await supabase
-        .from('citas')
-        .select('*, clientes(*), servicios(*), personal(*)')
-        .eq('fecha', fechaMañanaStr)
-        .eq('estado', 'confirmada')
-        .eq('recordatorio_enviado', false);
-
-    if (error) {
-        console.error('Error al consultar Supabase:', error);
+      document.getElementById('tab-clientes').className = tab === 'clientes' ? 
+        'px-4 py-2 border-b-2 border-rosegold text-rosegold font-medium text-sm flex items-center space-x-2' : 
+        'px-4 py-2 text-gray-400 font-medium text-sm flex items-center space-x-2';
+    }
+
+    function abrirModalCita() { document.getElementById('modal-cita').classList.remove('hidden'); }
+    function cerrarModalCita() { document.getElementById('modal-cita').classList.add('hidden'); }
+
+    async function guardarCita(e) {
+      e.preventDefault();
+      const nombre = document.getElementById('cita-cliente').value;
+      const telefono = document.getElementById('cita-telefono').value;
+      const servicio = document.getElementById('cita-servicio').value;
+      const fecha = document.getElementById('cita-fecha').value;
+      const hora = document.getElementById('cita-hora').value;
+
+      if (!db) {
+        alert("Atención: Guarda tus credenciales de Supabase en el código para almacenar la cita.");
+        cerrarModalCita();
         return;
+      }
+
+      // Guardar clienta si no existe
+      let { data: cliente } = await db.from('clientes').select('id').eq('telefono', telefono).maybeSingle();
+      if (!cliente) {
+        const { data: newCliente } = await db.from('clientes').insert([{ nombre, telefono }]).select().single();
+        cliente = newCliente;
+      }
+
+      // Guardar Cita
+      const fechaInicio = new Date(`${fecha}T${hora}`);
+      const fechaFin = new Date(fechaInicio.getTime() + 60*60*1000);
+
+      await db.from('citas').insert([{
+        cliente_id: cliente ? cliente.id : null,
+        fecha_inicio: fechaInicio.toISOString(),
+        fecha_fin: fechaFin.toISOString(),
+        estado: 'confirmada',
+        notas: servicio
+      }]);
+
+      cerrarModalCita();
+      cargarCitas();
     }
 
-    console.log(\`Se encontraron \${citas.length} citas para recordar.\`);
+    async function cargarCitas() {
+      if (!db) return;
+      const { data: citas } = await db.from('citas').select('*, clientes(nombre, telefono)').order('fecha_inicio', { ascending: true });
+      const contenedor = document.getElementById('lista-citas');
+      
+      if (!citas || citas.length === 0) {
+        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">No hay citas registradas.</div>';
+        return;
+      }
 
-    for (const cita of citas) {
-        const mensaje = \`¡Hola \${cita.clientes.nombre}! 💖 Te recordamos tu cita de mañana \${cita.fecha} a las \${cita.hora_inicio} para \${cita.servicios.nombre} con \${cita.personal.nombre} en Valkem Beauty SpA.\`;
-        
-        // Llamada a WhatsApp Cloud API o servicio Webhook
-        console.log(\`Enviando mensaje a \${cita.clientes.telefono}: \${mensaje}\`);
+      contenedor.innerHTML = citas.map(c => {
+        const f = new Date(c.fecha_inicio);
+        const fechaStr = f.toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const horaStr = f.toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit' });
+        const tel = c.clientes?.telefono ? c.clientes.telefono.replace(/[^0-9]/g, '') : '';
+        const mensaje = encodeURIComponent(`Hola ${c.clientes?.nombre || ''}, te recordamos tu cita en Valkem Beauty SpA para el ${fechaStr} a las ${horaStr} hrs (${c.notas || 'Servicio'}). ¡Te esperamos!`);
 
-        // Marcar como enviado
-        await supabase
-            .from('citas')
-            .update({ recordatorio_enviado: true })
-            .eq('id', cita.id);
+        return `
+          <div class="bg-card p-4 rounded-xl border border-gray-800 flex justify-between items-center shadow">
+            <div>
+              <div class="font-bold text-white">${c.clientes?.nombre || 'Clienta'}</div>
+              <div class="text-xs text-rosegold mt-0.5"><i class="fa-regular fa-clock mr-1"></i>${fechaStr} - ${horaStr} hrs</div>
+              <div class="text-xs text-gray-400 mt-0.5">${c.notas || 'Servicio General'}</div>
+            </div>
+            ${tel ? `
+              <a href="https://wa.me/${tel}?text=${mensaje}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-3 py-2 rounded-lg flex items-center space-x-1">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+                <span>Recordatorio</span>
+              </a>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
     }
-}
 
-enviarRecordatoriosDiarios();`;
+    async function cargarClientes() {
+      if (!db) return;
+      const { data: clientes } = await db.from('clientes').select('*').order('created_at', { ascending: false });
+      const contenedor = document.getElementById('lista-clientes');
+      
+      if (!clientes || clientes.length === 0) {
+        contenedor.innerHTML = '<div class="bg-card p-4 rounded-xl border border-gray-800 text-center text-gray-400 text-sm">No hay clientes en la base de datos.</div>';
+        return;
+      }
 
-            document.getElementById('supabase-sql-code').textContent = sql;
-            document.getElementById('github-action-code').textContent = yaml;
-            document.getElementById('nodejs-script-code').textContent = nodejs;
-        }
-
-        function copyCodeSnippet(elementId) {
-            const text = document.getElementById(elementId).textContent;
-            navigator.clipboard.writeText(text);
-            showToast('¡Código copiado al portapapeles!');
-        }
-
-        function exportDataJSON() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ services, staff, clients, appointments, templates }));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", `valkem_beauty_backup_${new Date().toISOString().split('T')[0]}.json`);
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-            showToast('Respaldo JSON descargado');
-        }
-
-        function resetToMockData() {
-            localStorage.clear();
-            location.reload();
-        }
-    </script>
+      contenedor.innerHTML = clientes.map(cl => `
+        <div class="bg-card p-4 rounded-xl border border-gray-800 shadow space-y-1">
+          <div class="font-bold text-white text-md">${cl.nombre}</div>
+          <div class="text-xs text-gray-400"><i class="fa-solid fa-phone text-rosegold mr-1"></i>${cl.telefono}</div>
+          ${cl.notas_historial ? `<div class="text-xs bg-gray-900/50 p-2 rounded text-gray-300 mt-2 border border-gray-800"><strong>Ficha:</strong> ${cl.notas_historial}</div>` : ''}
+        </div>
+      `).join('');
+    }
+  </script>
 </body>
 </html>
